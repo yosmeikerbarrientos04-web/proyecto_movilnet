@@ -1,19 +1,25 @@
+import os
 from pathlib import Path
 from django.contrib.messages import constants as message_constants
+import dj_database_url
 
 # Ruta base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- SEGURIDAD ---
-# IMPORTANTE: No compartas tu SECRET_KEY.
-SECRET_KEY = 'django-insecure-(w0l(o!qmnniszv(9hmrz7x%!(xw2%76b*^bbo*xn!(89a@#+l'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-(w0l(o!qmnniszv(9hmrz7x%!(xw2%76b*^bbo*xn!(89a@#+l')
 
-# DEBUG=True solo para desarrollo. ¡Cámbialo a False en producción!
-DEBUG = True
+# DEBUG=True solo para desarrollo.
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['*']
 
-# Permite que Cloudflare / ngrok puedan enviar formularios (POST) sin error de CSRF
-CSRF_TRUSTED_ORIGINS = ['https://*.trycloudflare.com', 'https://*.ngrok-free.app', 'https://*.ngrok.io']
+# Permite que Cloudflare / ngrok / Render puedan enviar formularios (POST) sin error de CSRF
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.trycloudflare.com',
+    'https://*.ngrok-free.app',
+    'https://*.ngrok.io',
+    'https://*.onrender.com',
+]
 
 # --- APLICACIONES ---
 INSTALLED_APPS = [
@@ -32,6 +38,7 @@ INSTALLED_APPS = [
 # Procesan las peticiones antes de llegar a las vistas (seguridad, sesiones, etc.)
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -61,19 +68,28 @@ TEMPLATES = [
 WSGI_APPLICATION = 'movilnet_config.wsgi.application'
 
 # --- BASE DE DATOS ---
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gestion_de_seguimiento',
-        'USER': 'postgres',
-        'PASSWORD': '1234', # TODO: Mover a variables de entorno (.env)
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-        'OPTIONS': {
-            'client_encoding': 'UTF8',
-        },
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'gestion_de_seguimiento',
+            'USER': 'postgres',
+            'PASSWORD': '1234',
+            'HOST': '127.0.0.1',
+            'PORT': '5432',
+            'OPTIONS': {
+                'client_encoding': 'UTF8',
+            },
+        }
+    }
 
 # --- VALIDACIÓN DE CONTRASEÑAS ---
 AUTH_PASSWORD_VALIDATORS = [
@@ -90,13 +106,13 @@ USE_I18N = True
 USE_TZ = True
 
 # --- ARCHIVOS ESTÁTICOS Y MULTIMEDIA ---
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 MEDIA_URL = '/media/'
 # CONFIGURACIÓN IMPORTANTE PARA ARCHIVOS:
-# Los archivos de los desarrolladores o analistas NO se guardan en la base de datos (Django solo guarda la ruta de texto).
-# Para evitar que la carpeta del código se ponga pesada, guardamos los archivos en una carpeta externa en el disco duro.
-# En cualquier PC, esto creará automáticamente una carpeta llamada 'Movilnet_Archivos' en la carpeta principal del usuario (ej. C:\Users\Usuario\Movilnet_Archivos).
-MEDIA_ROOT = Path.home() / 'Movilnet_Archivos'
+MEDIA_ROOT = BASE_DIR / 'media' if os.environ.get('DATABASE_URL') else (Path.home() / 'Movilnet_Archivos')
 
 # --- AUTENTICACIÓN Y SESIONES ---
 LOGIN_URL = 'login_usuario'
