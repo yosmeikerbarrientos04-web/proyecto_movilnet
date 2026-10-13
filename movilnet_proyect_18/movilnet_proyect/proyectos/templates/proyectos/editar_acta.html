@@ -1,0 +1,334 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Requerimientos - {{ proyecto.nombre }}</title>
+    <link rel="stylesheet" href="{% static 'proyectos/css/responsive.css' %}">
+    <style>
+        :root {
+            --movilnet-orange: #ff6600;
+            --bg-body: #f1f5f9;
+            --text-main: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--bg-body);
+            color: var(--text-main);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            border-top: 5px solid var(--movilnet-orange);
+        }
+
+        .header-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 15px;
+        }
+
+        .header-box h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            color: var(--text-main);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: 0.3s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--movilnet-orange);
+            box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.15);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            justify-content: flex-end;
+        }
+
+        .btn-save {
+            background: var(--movilnet-orange);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-save:hover {
+            background: #e65c00;
+        }
+
+        .btn-cancel {
+            background: #f1f5f9;
+            color: #475569;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-cancel:hover {
+            background: #e2e8f0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="header-box">
+                <div>
+                    <h2>✏️ Editar Acta de Recepción de Requerimiento</h2>
+                    <span style="font-size: 0.88rem; color: #64748b;">Proyecto: <strong>{{ proyecto.nombre }}</strong> (ID: {{ proyecto.identificador|default:'Sin ID' }})</span>
+                </div>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="id_siglas_solucion">Siglas de la Solución</label>
+                        {{ form.siglas_solucion }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_gerencia_receptora">Gerencia Receptora</label>
+                        {{ form.gerencia_receptora }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_nombre_cliente_funcional">Nombre Cliente Funcional</label>
+                        {{ form.nombre_cliente_funcional }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_unidad_funcional">Unidad Funcional</label>
+                        {{ form.unidad_funcional }}
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="id_descripcion">Descripción del Requerimiento</label>
+                        {{ form.descripcion }}
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="id_entregables">Entregables</label>
+                        {{ form.entregables }}
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="id_observaciones">Observaciones</label>
+                        {{ form.observaciones }}
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="id_detalles">Detalles (Apartado Adicional)</label>
+                        {{ form.detalles }}
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: HOJA 2 - FIRMAS AUTORIZADAS -->
+                <div style="margin-top: 35px; margin-bottom: 25px; border-top: 2px dashed #cbd5e1; padding-top: 25px;">
+                    <h3 style="margin: 0 0 6px 0; color: #1e293b; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        ✍️ Hoja 2: Firmas Autorizadas y Responsables (GGDSTI / GGPPTI / GGLITI)
+                    </h3>
+                    <p style="margin: 0 0 20px 0; color: #64748b; font-size: 0.85rem;">
+                        Ingrese o modifique el Nombre, Apellido y la Gerencia/Unidad para cada uno de los 8 bloques de firmas de la segunda página.
+                    </p>
+
+                    <!-- Firmante 1 -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 12px 0; font-size: 0.92rem; color: #ff6600; font-weight: 700;">Bloque 1 de Firma</h4>
+                        <div class="form-grid" style="margin-bottom: 0;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_1_nombre">Nombre y Apellido</label>
+                                {{ form.firmante_1_nombre }}
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_1_unidad">Unidad / Gerencia</label>
+                                {{ form.firmante_1_unidad }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firmante 2 -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 12px 0; font-size: 0.92rem; color: #ff6600; font-weight: 700;">Bloque 2 de Firma</h4>
+                        <div class="form-grid" style="margin-bottom: 0;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_2_nombre">Nombre y Apellido</label>
+                                {{ form.firmante_2_nombre }}
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_2_unidad">Unidad / Gerencia</label>
+                                {{ form.firmante_2_unidad }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firmante 3 -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 12px 0; font-size: 0.92rem; color: #ff6600; font-weight: 700;">Bloque 3 de Firma</h4>
+                        <div class="form-grid" style="margin-bottom: 0;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_3_nombre">Nombre y Apellido</label>
+                                {{ form.firmante_3_nombre }}
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_3_unidad">Unidad / Gerencia</label>
+                                {{ form.firmante_3_unidad }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firmante 4 -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 12px 0; font-size: 0.92rem; color: #ff6600; font-weight: 700;">Bloque 4 de Firma</h4>
+                        <div class="form-grid" style="margin-bottom: 0;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_4_nombre">Nombre y Apellido</label>
+                                {{ form.firmante_4_nombre }}
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_4_unidad">Unidad / Gerencia</label>
+                                {{ form.firmante_4_unidad }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firmante 5 -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 12px 0; font-size: 0.92rem; color: #ff6600; font-weight: 700;">Bloque 5 de Firma</h4>
+                        <div class="form-grid" style="margin-bottom: 0;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_5_nombre">Nombre y Apellido</label>
+                                {{ form.firmante_5_nombre }}
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_5_unidad">Unidad / Gerencia</label>
+                                {{ form.firmante_5_unidad }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firmante 6 -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 12px 0; font-size: 0.92rem; color: #ff6600; font-weight: 700;">Bloque 6 de Firma</h4>
+                        <div class="form-grid" style="margin-bottom: 0;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_6_nombre">Nombre y Apellido</label>
+                                {{ form.firmante_6_nombre }}
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_6_unidad">Unidad / Gerencia</label>
+                                {{ form.firmante_6_unidad }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firmante 7 -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 12px 0; font-size: 0.92rem; color: #ff6600; font-weight: 700;">Bloque 7 de Firma</h4>
+                        <div class="form-grid" style="margin-bottom: 0;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_7_nombre">Nombre y Apellido</label>
+                                {{ form.firmante_7_nombre }}
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_7_unidad">Unidad / Gerencia</label>
+                                {{ form.firmante_7_unidad }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firmante 8 -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 12px 0; font-size: 0.92rem; color: #ff6600; font-weight: 700;">Bloque 8 de Firma</h4>
+                        <div class="form-grid" style="margin-bottom: 0;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_8_nombre">Nombre y Apellido</label>
+                                {{ form.firmante_8_nombre }}
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="id_firmante_8_unidad">Unidad / Gerencia</label>
+                                {{ form.firmante_8_unidad }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <a href="{% url 'ver_acta_aceptacion' proyecto.id %}" class="btn-cancel">Cancelar</a>
+                    <button type="submit" class="btn-save">💾 Guardar Cambios del Acta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

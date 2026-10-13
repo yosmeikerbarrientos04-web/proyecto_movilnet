@@ -1,0 +1,674 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acta de Recepción - {{ proyecto.nombre }}</title>
+    <style>
+        @page {
+            size: letter portrait;
+            margin: 15mm 15mm 15mm 15mm;
+        }
+
+        :root {
+            --movilnet-orange: #ff6600;
+            --border-color: #000000;
+            --header-bg: #d9d9d9;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+            color: #000;
+        }
+
+        /* BARRA DE ACCIONES (SOLO PANTALLA) */
+        .no-print-bar {
+            background: #1e293b;
+            color: white;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .no-print-bar h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-acta {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-back {
+            background: #475569;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background: #334155;
+        }
+
+        .btn-edit {
+            background: #0284c7;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #0369a1;
+        }
+
+        .btn-approve {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #15803d;
+        }
+
+        .btn-print {
+            background: var(--movilnet-orange);
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: #e65c00;
+        }
+
+        .btn-excel {
+            background: #107c41;
+            color: white;
+        }
+
+        .btn-excel:hover {
+            background: #0b5c30;
+        }
+
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .badge-PENDIENTE {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-APROBADO {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        /* CONTENEDOR DE HOJA IMPRIMIBLE */
+        .document-wrapper {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            padding: 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .page {
+            width: 100%;
+            min-height: 1050px;
+            padding: 40px;
+            background: white;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .page-break {
+            page-break-before: always;
+            break-before: page;
+        }
+
+        /* CABECERA DEL DOCUMENTO */
+        .doc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .logo-container {
+            width: 140px;
+        }
+
+        .logo-img {
+            max-width: 130px;
+            height: auto;
+        }
+
+        .logo-text-fallback {
+            color: var(--movilnet-orange);
+            font-weight: 900;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header-title-container {
+            flex: 1;
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        .doc-org-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+        }
+
+        .doc-main-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .date-box-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .date-table {
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .date-table td {
+            padding: 4px 8px;
+        }
+
+        .date-label {
+            font-weight: bold;
+        }
+
+        .date-value {
+            border: 1px solid var(--border-color);
+            min-width: 100px;
+            text-align: center;
+        }
+
+        /* TABLAS DEL DOCUMENTO */
+        table.doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+            font-size: 0.8rem;
+        }
+
+        table.doc-table th,
+        table.doc-table td {
+            border: 1px solid var(--border-color);
+            padding: 6px 8px;
+            vertical-align: middle;
+        }
+
+        table.doc-table th.table-header {
+            background-color: var(--header-bg);
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            padding: 6px;
+        }
+
+        .field-label {
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: #fff;
+            width: 20%;
+        }
+
+        .field-value {
+            background-color: #fff;
+        }
+
+        .section-box {
+            border: 1px solid var(--border-color);
+            border-top: none;
+            min-height: 90px;
+            padding: 10px;
+            font-size: 0.82rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* REGION DE FIRMAS EN PAGINA 2 */
+        .signatures-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-left: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .signature-box {
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px 6px;
+            font-size: 0.73rem;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sig-approved {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .sig-line {
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        .sig-name {
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .sig-unit {
+            font-size: 0.68rem;
+            color: #1e293b;
+            margin-top: 4px;
+        }
+
+        /* RESPONSIVE PARA DISPOSITIVOS MÓVILES */
+        @media screen and (max-width: 768px) {
+            .no-print-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 12px 15px;
+            }
+            .action-btns {
+                flex-wrap: wrap;
+                width: 100%;
+            }
+            .btn-acta {
+                flex: 1;
+                justify-content: center;
+                padding: 10px 12px;
+            }
+            .document-wrapper {
+                margin: 10px auto;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .page {
+                min-width: 680px;
+                padding: 20px;
+            }
+        }
+
+        /* ESTILOS DE IMPRESIÓN */
+        @media print {
+            .no-print-bar {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+            }
+
+            .document-wrapper {
+                max-width: 100% !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+            }
+
+            .page {
+                padding: 0 !important;
+                min-height: auto !important;
+            }
+
+            .page-break {
+                page-break-before: always !important;
+                break-before: page !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- BARRA DE ACCIONES PARA NAVEGACIÓN Y ACCIONES -->
+    <div class="no-print-bar">
+        <h3>
+            <span>📄 Aceptación de Proyecto</span>
+            <span class="badge-status badge-{{ acta.estado }}">{{ acta.get_estado_display }}</span>
+        </h3>
+        <div class="action-btns">
+            <a href="{% url 'home' %}" class="btn-acta btn-back">← Volver al Panel</a>
+            {% if not es_jefe %}
+            <a href="{% url 'editar_acta_aceptacion' proyecto.id %}" class="btn-acta btn-edit">✏️ Editar Requerimientos</a>
+            {% endif %}
+
+            {% if acta.estado == 'PENDIENTE' and es_jefe %}
+            <form action="{% url 'aprobar_proyecto_acta' proyecto.id %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-acta btn-approve" onclick="return confirm('¿Confirmas la aprobación oficial de la Acta de Recepción para este proyecto?');">
+                    ✅ Aprobar Proyecto
+                </button>
+            </form>
+            {% endif %}
+
+            <button onclick="window.print()" class="btn-acta btn-print" title="Imprimir o guardar como PDF">🖨️ Imprimir / PDF</button>
+            <a href="{% url 'descargar_acta_excel' proyecto.id %}" class="btn-acta btn-excel" title="Descargar Acta en formato Excel (.xlsx)">
+                📊 Guardar en Excel
+            </a>
+        </div>
+    </div>
+
+    <div class="document-wrapper">
+
+        <!-- ==================== PÁGINA 1 ==================== -->
+        <div class="page">
+            <!-- CABECERA -->
+            <div class="doc-header">
+                <div class="logo-container">
+                    <img src="{% static 'proyectos/imagen/movilnet.icon.jpg' %}" alt="Movilnet" class="logo-img"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="logo-text-fallback" style="display:none;">movilnet</div>
+                </div>
+                <div class="header-title-container">
+                    <div class="doc-org-title">GERENCIA GENERAL DE DESARROLLO DE SOLUCIONES TI</div>
+                    <div class="doc-main-title">ACTA DE RECEPCIÓN DE REQUERIMIENTO DE SOLUCIÓN TECNOLÓGICA (SOFTWARE)</div>
+                </div>
+            </div>
+
+            <!-- FECHA -->
+            <div class="date-box-container">
+                <table class="date-table">
+                    <tr>
+                        <td class="date-label">FECHA:</td>
+                        <td class="date-value">{{ acta.fecha|date:"d/m/Y" }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- REQUERIMIENTO -->
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th colspan="4" class="table-header">REQUERIMIENTO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="field-label">PROYECTO</td>
+                        <td class="field-value" style="width: 45%;">{{ proyecto.nombre }}</td>
+                        <td class="field-label" style="width: 10%; text-align: center;">ID</td>
+                        <td class="field-value" style="width: 25%;">{{ proyecto.identificador|default:'' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="field-label">SIGLAS DE LA SOLUCIÓN</td>
+                        <td class="field-value">{{ acta.siglas_solucion|default:'' }}</td>
+                        <td class="field-label" style="font-size: 0.7rem;">GERENCIA RECEPTORA</td>
+                        <td class="field-value" style="font-size: 0.75rem;">{{ acta.gerencia_receptora|default:'' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="field-label">NOMBRE CLIENTE FUNCIONAL</td>
+                        <td class="field-value">{{ acta.nombre_cliente_funcional|default:'' }}</td>
+                        <td class="field-label" style="font-size: 0.7rem;">UNIDAD FUNCIONAL</td>
+                        <td class="field-value" style="font-size: 0.75rem;">{{ acta.unidad_funcional|default:'' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- DESCRIPCIÓN -->
+            <table class="doc-table" style="border-top: none;">
+                <thead>
+                    <tr>
+                        <th class="table-header">DESCRIPCIÓN</th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="section-box">{% if acta.descripcion %}{{ acta.descripcion }}{% endif %}</div>
+
+            <!-- ENTREGABLES -->
+            <table class="doc-table" style="margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th class="table-header">ENTREGABLES</th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="section-box">{% if acta.entregables %}{{ acta.entregables }}{% endif %}</div>
+
+            <!-- OBSERVACIONES -->
+            <table class="doc-table" style="margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th class="table-header">OBSERVACIONES</th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="section-box" style="min-height: 70px;">{% if acta.observaciones %}{{ acta.observaciones }}{% endif %}</div>
+
+            <!-- DETALLES (APARTADO ADICIONADO) -->
+            <table class="doc-table" style="margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th class="table-header">DETALLES</th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="section-box" style="min-height: 70px;">{% if acta.detalles %}{{ acta.detalles }}{% endif %}</div>
+
+        </div>
+
+        <!-- ==================== PÁGINA 2 ==================== -->
+        <div class="page page-break">
+            <!-- CABECERA DE PÁGINA 2 -->
+            <div class="doc-header">
+                <div class="logo-container">
+                    <img src="{% static 'proyectos/imagen/movilnet.icon.jpg' %}" alt="Movilnet" class="logo-img"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="logo-text-fallback" style="display:none;">movilnet</div>
+                </div>
+                <div class="header-title-container">
+                    <div class="doc-org-title">GERENCIA GENERAL DE DESARROLLO DE SOLUCIONES TI</div>
+                    <div class="doc-main-title">ACTA DE RECEPCIÓN DE REQUERIMIENTO DE SOLUCIÓN TECNOLÓGICA (SOFTWARE)</div>
+                </div>
+            </div>
+
+            <!-- BARRA DE REQUERIMIENTO EN PAGINA 2 -->
+            <table class="doc-table" style="margin-bottom: 15px;">
+                <thead>
+                    <tr>
+                        <th colspan="4" class="table-header">REQUERIMIENTO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="field-label">PROYECTO</td>
+                        <td class="field-value" style="width: 45%;">{{ proyecto.nombre }}</td>
+                        <td class="field-label" style="width: 10%; text-align: center;">ID</td>
+                        <td class="field-value" style="width: 25%;">{{ proyecto.identificador|default:'' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ENCABEZADO DE FIRMAS -->
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th class="table-header">FIRMAS AUTORIZADAS<br>GGDSTI / GGPPTI / GGLITI</th>
+                    </tr>
+                </thead>
+            </table>
+
+            <!-- GRILLA DE 8 BLOQUES DE FIRMAS -->
+            <div class="signatures-grid">
+
+                <!-- 1 -->
+                <div class="signature-box">
+                    <div>
+                        <div class="sig-approved">Aprobado por:</div>
+                        <div class="sig-line">_____/_____/_____</div>
+                        <div class="sig-name">Nombre y Apellido:</div>
+                        <div style="font-weight: 500; min-height: 1.2em;">{{ acta.firmante_1_nombre|default:"" }}</div>
+                    </div>
+                    <div>
+                        <div class="sig-line">Firma: ____________________</div>
+                        <div class="sig-unit"><strong>Unidad:</strong> {{ acta.firmante_1_unidad|default:"" }}</div>
+                    </div>
+                </div>
+
+                <!-- 2 -->
+                <div class="signature-box">
+                    <div>
+                        <div class="sig-approved">Aprobado por:</div>
+                        <div class="sig-line">_____/_____/_____</div>
+                        <div class="sig-name">Nombre y Apellido:</div>
+                        <div style="font-weight: 500; min-height: 1.2em;">{{ acta.firmante_2_nombre|default:"" }}</div>
+                    </div>
+                    <div>
+                        <div class="sig-line">Firma: ____________________</div>
+                        <div class="sig-unit"><strong>Unidad:</strong> {{ acta.firmante_2_unidad|default:"" }}</div>
+                    </div>
+                </div>
+
+                <!-- 3 -->
+                <div class="signature-box">
+                    <div>
+                        <div class="sig-approved">Aprobado por:</div>
+                        <div class="sig-line">_____/_____/_____</div>
+                        <div class="sig-name">Nombre y Apellido:</div>
+                        <div style="font-weight: 500; min-height: 1.2em;">{{ acta.firmante_3_nombre|default:"" }}</div>
+                    </div>
+                    <div>
+                        <div class="sig-line">Firma: ____________________</div>
+                        <div class="sig-unit"><strong>Unidad:</strong> {{ acta.firmante_3_unidad|default:"" }}</div>
+                    </div>
+                </div>
+
+                <!-- 4 -->
+                <div class="signature-box">
+                    <div>
+                        <div class="sig-approved">Aprobado por:</div>
+                        <div class="sig-line">_____/_____/_____</div>
+                        <div class="sig-name">Nombre y Apellido:</div>
+                        <div style="font-weight: 500; min-height: 1.2em;">{{ acta.firmante_4_nombre|default:"" }}</div>
+                    </div>
+                    <div>
+                        <div class="sig-line">Firma: ____________________</div>
+                        <div class="sig-unit"><strong>Unidad:</strong> {{ acta.firmante_4_unidad|default:"" }}</div>
+                    </div>
+                </div>
+
+                <!-- 5 -->
+                <div class="signature-box">
+                    <div>
+                        <div class="sig-approved">Aprobado por:</div>
+                        <div class="sig-line">_____/_____/_____</div>
+                        <div class="sig-name">Nombre y Apellido:</div>
+                        <div style="font-weight: 500; min-height: 1.2em;">{{ acta.firmante_5_nombre|default:"" }}</div>
+                    </div>
+                    <div>
+                        <div class="sig-line">Firma: ____________________</div>
+                        <div class="sig-unit"><strong>Unidad:</strong> {{ acta.firmante_5_unidad|default:"" }}</div>
+                    </div>
+                </div>
+
+                <!-- 6 -->
+                <div class="signature-box">
+                    <div>
+                        <div class="sig-approved">Aprobado por:</div>
+                        <div class="sig-line">_____/_____/_____</div>
+                        <div class="sig-name">Nombre y Apellido:</div>
+                        <div style="font-weight: 500; min-height: 1.2em;">{{ acta.firmante_6_nombre|default:"" }}</div>
+                    </div>
+                    <div>
+                        <div class="sig-line">Firma: ____________________</div>
+                        <div class="sig-unit"><strong>Unidad:</strong> {{ acta.firmante_6_unidad|default:"" }}</div>
+                    </div>
+                </div>
+
+                <!-- 7 -->
+                <div class="signature-box">
+                    <div>
+                        <div class="sig-approved">Aprobado por:</div>
+                        <div class="sig-line">_____/_____/_____</div>
+                        <div class="sig-name">Nombre y Apellido:</div>
+                        <div style="font-weight: 500; min-height: 1.2em;">{{ acta.firmante_7_nombre|default:"" }}</div>
+                    </div>
+                    <div>
+                        <div class="sig-line">Firma: ____________________</div>
+                        <div class="sig-unit"><strong>Unidad:</strong> {{ acta.firmante_7_unidad|default:"" }}</div>
+                    </div>
+                </div>
+
+                <!-- 8 -->
+                <div class="signature-box">
+                    <div>
+                        <div class="sig-approved">Aprobado por:</div>
+                        <div class="sig-line">_____/_____/_____</div>
+                        <div class="sig-name">Nombre y Apellido:</div>
+                        <div style="font-weight: 500; min-height: 1.2em;">{{ acta.firmante_8_nombre|default:"" }}</div>
+                    </div>
+                    <div>
+                        <div class="sig-line">Firma: ____________________</div>
+                        <div class="sig-unit"><strong>Unidad:</strong> {{ acta.firmante_8_unidad|default:"" }}</div>
+                    </div>
+                </div>
+
+            </div>
+
+            {% if acta.estado == 'APROBADO' %}
+            <div style="margin-top: 25px; padding: 10px 15px; background: #dcfce7; border: 1px solid #86efac; border-radius: 6px; text-align: center; font-size: 0.8rem; color: #166534; font-weight: bold;">
+                ✅ PROYECTO OFICIALMENTE APROBADO POR EL JEFE DE PROYECTOS
+                {% if acta.aprobado_por %}({{ acta.aprobado_por.get_full_name|default:acta.aprobado_por.username }}){% endif %}
+                EL {{ acta.fecha_aprobacion|date:"d/m/Y h:i A" }}
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

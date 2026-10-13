@@ -1,0 +1,541 @@
+/* ==========================================================================
+   MOVILNET GESTION - RESPONSIVE & MOBILE ADAPTIVE STYLES
+   Adaptacion completa para computadoras, tablets y telefonos moviles
+   ========================================================================== */
+
+/* --- RESET & BOX SIZING GLOBAL --- */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* --- BARRA SUPERIOR MOVIL (HAMBURGUESA) --- */
+.mobile-topbar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    padding: 12px 18px;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 990;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.mobile-logo {
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: #ff6600;
+    text-decoration: none;
+    letter-spacing: -0.3px;
+}
+
+.btn-hamburger {
+    background: #fff7ed;
+    color: #ff6600;
+    border: 1px solid #ffd6b3;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-hamburger:active {
+    background: #ffedd5;
+    transform: scale(0.95);
+}
+
+/* --- OVERLAY DE FONDO PARA SIDEBAR EN MOVIL --- */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* --- BOTON CERRAR DENTRO DEL SIDEBAR EN MOVIL --- */
+.sidebar-close-btn {
+    display: none;
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: #f1f5f9;
+    border: none;
+    color: #64748b;
+    font-size: 1.3rem;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.sidebar-close-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+/* --- CONTENEDORES DE TABLAS RESPONSIVAS --- */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.table-responsive table {
+    min-width: 600px;
+    width: 100%;
+    margin: 0 !important;
+}
+
+/* --- MEDIA QUERY: TABLETS Y TELEFONOS (≤ 1024px) --- */
+@media (max-width: 1024px) {
+    body {
+        flex-direction: column !important;
+    }
+
+    .mobile-topbar {
+        display: flex !important;
+    }
+
+    /* Sidebar se convierte en cajón deslizable */
+    .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: 290px !important;
+        max-width: 85vw !important;
+        height: 100vh !important;
+        z-index: 999 !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 4px 0 25px rgba(0, 0, 0, 0.15) !important;
+        overflow-y: auto !important;
+        padding-top: 25px !important;
+    }
+
+    .sidebar.open {
+        transform: translateX(0) !important;
+    }
+
+    .sidebar-close-btn {
+        display: flex !important;
+    }
+
+    /* Main content ocupa todo el ancho */
+    .main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 20px 16px !important;
+    }
+
+    /* Modales adaptados a pantallas medianas */
+    .modal-box {
+        width: 92% !important;
+        max-width: 550px !important;
+        margin: 20px auto !important;
+        padding: 20px 16px !important;
+    }
+
+    /* Grilla de proyectos en tablet */
+    .projects-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+        gap: 16px !important;
+    }
+}
+
+/* --- MEDIA QUERY: TELEFONOS MOVILES (≤ 768px) --- */
+@media (max-width: 768px) {
+    /* Tipografía y encabezados */
+    h1 {
+        font-size: 1.4rem !important;
+        line-height: 1.25 !important;
+    }
+
+    h2 {
+        font-size: 1.25rem !important;
+    }
+
+    h3 {
+        font-size: 1.1rem !important;
+    }
+
+    /* Encabezados y botones de accion */
+    .header-flex {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .header-flex > * {
+        width: 100% !important;
+        text-align: center !important;
+    }
+
+    .btn-orange, .btn-primary, .btn-submit {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+        padding: 12px 16px !important;
+        font-size: 0.95rem !important;
+    }
+
+    /* Grilla de proyectos en móvil: 1 sola columna fluida */
+    .projects-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .project-card {
+        padding: 16px !important;
+    }
+
+    .project-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+    }
+
+    .project-actions {
+        width: 100% !important;
+        max-width: 100% !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
+    }
+
+    .project-actions .btn-outline {
+        flex: 1 !important;
+        min-width: 36px !important;
+        height: 36px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .project-meta {
+        flex-direction: column !important;
+        gap: 6px !important;
+    }
+
+    /* Filtros y formularios en móvil */
+    .filter-bar, .search-bar, .form-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+
+    .filter-bar input, .filter-bar select, .filter-bar button {
+        width: 100% !important;
+    }
+
+    /* Tablero Kanban en móvil */
+    .kanban-header {
+        padding: 15px 12px !important;
+    }
+
+    .kanban-board {
+        padding: 0 12px 20px 12px !important;
+        gap: 14px !important;
+        scroll-snap-type: x mandatory !important;
+        scroll-padding: 12px !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .kanban-column {
+        min-width: calc(100vw - 36px) !important;
+        max-width: calc(100vw - 36px) !important;
+        scroll-snap-align: start !important;
+    }
+
+    .navbar {
+        padding: 12px 14px !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+
+    .navbar > div {
+        justify-content: space-between !important;
+        width: 100% !important;
+    }
+
+    /* Formulario contenedor */
+    .form-container, .card, .container {
+        padding: 18px 14px !important;
+        border-radius: 10px !important;
+    }
+
+    /* Modales en teléfonos */
+    .modal-box {
+        width: 95% !important;
+        max-width: 95% !important;
+        margin: 10px auto !important;
+        padding: 16px 14px !important;
+        max-height: 90vh !important;
+    }
+
+    .modal-actions {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    .modal-actions button, .modal-actions a {
+        width: 100% !important;
+        text-align: center !important;
+    }
+
+    /* Menús flotantes de notificaciones en móvil */
+    .proj-notif-menu {
+        width: calc(100vw - 30px) !important;
+        max-width: 340px !important;
+        right: -10px !important;
+    }
+
+    /* Tarjeta de usuario en sidebar */
+    .user-profile-card {
+        padding: 10px !important;
+    }
+}
+
+/* --- MEDIA QUERY: TELEFONOS MUY PEQUEÑOS (≤ 380px) --- */
+@media (max-width: 380px) {
+    .btn-outline {
+        padding: 4px 6px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .kanban-column {
+        min-width: calc(100vw - 24px) !important;
+        max-width: calc(100vw - 24px) !important;
+    }
+}
+
+/* ==========================================================================
+   FIXES ESPECÍFICOS PARA PÁGINAS DE GERENTE EN MÓVIL
+   cancelados.html · revision_tareas.html · desarrolladores.html
+   ========================================================================== */
+
+/* --- WRAPPER SCROLL HORIZONTAL PARA TABLAS EN PÁGINAS DE GERENTE --- */
+.table-scroll-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.table-scroll-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* --- PROYECTOS INHABILITADOS (cancelados.html) --- */
+@media (max-width: 768px) {
+    /* La tabla de proyectos inhabilitados permite scroll horizontal */
+    .cancelados-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        margin-top: 12px;
+    }
+
+    .cancelados-table-wrap table {
+        min-width: 520px;
+        width: 100%;
+        margin: 0 !important;
+    }
+
+    /* Botón restaurar: grande, fácil de pulsar en táctil */
+    .btn-restaurar {
+        width: 100% !important;
+        min-width: 100px !important;
+        padding: 10px 12px !important;
+        font-size: 0.9rem !important;
+        white-space: nowrap !important;
+        border-radius: 8px !important;
+    }
+
+    /* --- APROBAR TAREAS (revision_tareas.html) --- */
+    .revision-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        margin-top: 12px;
+    }
+
+    .revision-table-wrap table {
+        min-width: 580px;
+        width: 100%;
+        margin: 0 !important;
+    }
+
+    /* Botones aprobar / devolver: ancho completo y altura táctil */
+    .btn-aprobar {
+        width: 100% !important;
+        padding: 10px 12px !important;
+        font-size: 0.88rem !important;
+        white-space: nowrap !important;
+        border-radius: 8px !important;
+    }
+
+    .btn-devolver {
+        width: 100% !important;
+        padding: 10px 12px !important;
+        font-size: 0.88rem !important;
+        white-space: nowrap !important;
+        border-radius: 8px !important;
+        margin-top: 6px !important;
+    }
+
+    /* Textarea de comentario: ancho completo */
+    .revision-table-wrap textarea,
+    .card table td form textarea {
+        width: 100% !important;
+        min-height: 55px !important;
+        font-size: 0.82rem !important;
+        box-sizing: border-box !important;
+    }
+
+    /* --- DESARROLLADORES (desarrolladores.html) --- */
+    .desarrolladores-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        margin-top: 12px;
+    }
+
+    .desarrolladores-table-wrap table {
+        min-width: 620px;
+        width: 100%;
+        margin: 0 !important;
+    }
+
+    /* Botón "Proyectos" dentro de la tabla de desarrolladores */
+    .btn-proyectos {
+        padding: 8px 10px !important;
+        font-size: 0.82rem !important;
+        min-width: 90px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Drawer de proyectos: ocupa casi toda la pantalla en móvil */
+    .drawer-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 16px 16px 0 0 !important;
+        top: auto !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        left: 0 !important;
+        height: 88vh !important;
+        transform: translateY(100%) !important;
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .drawer-panel.active {
+        transform: translateY(0) !important;
+    }
+
+    .drawer-body {
+        padding: 14px 14px !important;
+        overflow-y: auto !important;
+    }
+
+    .drawer-header {
+        padding: 14px 16px !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    .drawer-footer {
+        padding: 10px 16px !important;
+        border-top: 1px solid #e2e8f0 !important;
+    }
+
+    /* Mini-pills de stats dentro del drawer */
+    .stats-pill-grid {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+    }
+
+    .mini-pill {
+        font-size: 0.78rem !important;
+        padding: 4px 8px !important;
+    }
+
+    /* Botones de acción dentro del drawer (Entrar al tablero, Ver Padre) */
+    .project-drawer-actions {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    .btn-enter-project,
+    .btn-parent-project {
+        width: 100% !important;
+        text-align: center !important;
+        padding: 10px 14px !important;
+        font-size: 0.88rem !important;
+        border-radius: 8px !important;
+        display: block !important;
+    }
+
+    /* Header de proyectos dentro del drawer */
+    .header-flex .btn-back {
+        width: 100% !important;
+        text-align: center !important;
+        padding: 10px 14px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Drawer en pantallas muy pequeñas: altura máxima */
+@media (max-width: 380px) {
+    .drawer-panel {
+        height: 92vh !important;
+    }
+
+    .btn-aprobar,
+    .btn-devolver,
+    .btn-restaurar {
+        font-size: 0.82rem !important;
+        padding: 9px 10px !important;
+    }
+}

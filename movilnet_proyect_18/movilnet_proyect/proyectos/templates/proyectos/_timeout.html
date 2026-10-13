@@ -1,0 +1,55 @@
+<!-- Script de inactividad de sesión -->
+<style>
+    /* Forzar que el modal aparezca siempre al frente y en el centro absoluto */
+    div.swal2-container {
+        z-index: 999999 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    (function () {
+        let timeout;
+        // 10 minutos = 600,000 milisegundos
+        const INACTIVITY_LIMIT = 600000;
+
+        function resetTimer() {
+            clearTimeout(timeout);
+            timeout = setTimeout(logout, INACTIVITY_LIMIT);
+        }
+
+        function logout() {
+            Swal.fire({
+                title: 'Sesión Caducada',
+                text: 'Su sesión ha caducado por inactividad. Vuelva a iniciar sesión.',
+                icon: 'warning',
+                position: 'center',
+                backdrop: false, /* el fondo ya lo controla nuestro CSS custom arriba */
+                confirmButtonColor: '#ff6600',
+                confirmButtonText: 'Iniciar Sesión',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{% url 'logout' %}";
+                }
+            });
+        }
+
+        // Iniciar temporizador
+        window.onload = resetTimer;
+        // Reiniciar en eventos de usuario
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+        document.onclick = resetTimer;
+        document.onscroll = resetTimer;
+    })();
+</script>

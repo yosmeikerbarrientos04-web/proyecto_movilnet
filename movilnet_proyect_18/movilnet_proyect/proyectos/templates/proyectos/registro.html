@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOVILNET - Registro</title>
+  <link rel="shortcut icon" href="{% static 'proyectos/imagen/movilnet.icon.jpg' %}">
+  <link rel="stylesheet" href="{% static 'proyectos/css/estructura2.css' %}">
+  <script src="{% static 'proyectos/js/registro.js' %}" defer></script>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="logo">
+      <img src="{% static 'proyectos/imagen/movilnet.icon.jpg' %}" alt="Logo Movilnet">
+    </div>
+    <ul class="menu">
+      <li><a href="{% url 'home' %}#planes">Planes</a></li>
+      <li><a href="{% url 'home' %}#login">Login</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+  </nav>
+
+  <section id="registro" class="login"><br><br><br>
+
+    <div class="login-container" style="max-width: 500px; margin: auto;">
+
+      <!-- BLOQUE DE MENSAJES INTELIGENTE -->
+      {% if messages %}
+      {% for message in messages %}
+      {% if 'success' in message.tags %}
+      <!-- Mensaje de Éxito (Verde + Cohete) -->
+      <div style="padding: 15px; margin-bottom: 20px; border-radius: 10px; 
+                              background-color: #e6fffa; color: #155724; border: 1px solid #38b2ac; 
+                              text-align: center; font-size: 15px; font-weight: bold; border-left: 8px solid #ff6600;
+                              box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        {{ message }}
+      </div>
+      {% else %}
+      <!-- Mensaje de Error (Rojo) -->
+      <div style="padding: 12px; margin-bottom: 20px; border-radius: 8px; 
+                              background-color: #fff5f5; color: #c53030; border: 1px solid #feb2b2; 
+                              text-align: center; font-size: 14px; font-weight: bold; border-left: 6px solid #ff6600;">
+        ⚠️ {{ message }}
+      </div>
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+
+      <h2>📝 Crear Cuenta Nueva</h2>
+
+      <form class="registro-form" id="registroForm" method="POST" action="{% url 'registro' %}">
+        {% csrf_token %}
+
+        <div class="input-row">
+          <div class="input-group">
+            <label>Nombre</label>
+            <input type="text" name="nombre" id="nombre" placeholder="Ej: Juan" required>
+          </div>
+          <div class="input-group">
+            <label>Apellido</label>
+            <input type="text" name="apellido" id="apellido" placeholder="Ej: Pérez" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Correo Electrónico</label>
+          <input type="email" name="correo" id="correo" placeholder="usuario@correo.com" required>
+        </div>
+
+        <div class="input-group">
+          <label>Número Movilnet</label>
+          <input type="tel" name="telefono" id="telefono" placeholder="04160000000" maxlength="11" required>
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label>Contraseña</label>
+            <input type="password" name="pass1" id="pass1" placeholder="********" minlength="6" required>
+          </div>
+          <div class="input-group">
+            <label>Confirmar Contraseña</label>
+            <input type="password" name="pass2" id="pass2" placeholder="********" minlength="6" required>
+          </div>
+        </div>
+
+        <div id="mensaje-registro" style="margin-bottom: 15px; font-size: 14px; font-weight: bold; text-align: center;">
+        </div>
+
+        <input type="submit" value="Registrarme" class="btn-enviar" style="background-color: #ff6600; cursor: pointer;">
+        <p class="footer-form" style="text-align: center; margin-top: 15px;">
+          ¿Ya tienes cuenta? <a href="{% url 'home' %}#login"
+            style="color: #ff6600; font-weight: bold; text-decoration: none;">Inicia sesión</a>
+        </p>
+      </form>
+    </div>
+  </section>
+
+  <footer id="contacto" class="footer">
+    <p>📞 Atención al cliente: 0800-MOVILNET</p>
+    <p>© 2026 Movilnet - Todos los derechos reservados</p>
+  </footer>
+</body>
+
+</html>

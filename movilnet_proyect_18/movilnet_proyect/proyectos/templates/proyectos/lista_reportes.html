@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Reportes</title>
+    <link rel="stylesheet" href="{% static 'proyectos/css/responsive.css' %}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            padding: 40px;
+            color: #1e293b;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #ff6600;
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .btn-volver {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        .btn-view {
+            background: #ff6600;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(255, 102, 0, 0.2);
+            white-space: nowrap;
+        }
+
+        .btn-view:hover {
+            background: #e65c00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
+        }
+
+        .btn-view:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="{% url 'home' %}" class="btn-volver">⬅ Volver al Home</a>
+        <h1>📊 Historial de Reportes Generados</h1>
+
+        {% if reportes %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título del Reporte</th>
+                        <th>Proyecto Asociado</th>
+                        <th>Generado Por</th>
+                        <th>Fecha</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reporte in reportes %}
+                    <tr>
+                        <td>#{{ reporte.id }}</td>
+                        <td><strong>{{ reporte.titulo }}</strong></td>
+                        <td>{{ reporte.proyecto.nombre }}</td>
+                        <td>{% if reporte.autor %}{{ reporte.autor.first_name|default:reporte.autor.username }}{% else %}Desconocido{% endif %}</td>
+                        <td>{{ reporte.fecha_creacion|date:"d M Y, H:i" }}</td>
+                        <td><a href="{% url 'ver_reporte' reporte.id %}" class="btn-view" target="_blank">👁️ Ver
+                                Reporte</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p style="color: #64748b;">No hay reportes generados todavía.</p>
+        {% endif %}
+    </div>
+    {% include 'proyectos/_timeout.html' %}
+</body>
+
+</html>

@@ -1,0 +1,410 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyectos Culminados - Movilnet</title>
+    <link rel="stylesheet" href="{% static 'proyectos/css/responsive.css' %}">
+    <style>
+        :root {
+            --movilnet-orange: #ff6600;
+            --bg-body: #f1f5f9;
+            --text-main: #1e293b;
+            --sidebar-width: 260px;
+            --green: #10b981;
+            --green-light: #d1fae5;
+        }
+
+        body {
+            display: flex;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            height: 100vh;
+            position: fixed;
+            border-right: 1px solid #e2e8f0;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            color: var(--movilnet-orange);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+
+        .nav-group {
+            margin-bottom: 30px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            transition: 0.3s;
+            margin-bottom: 5px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #fff7ed;
+            color: var(--movilnet-orange);
+            font-weight: 600;
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 40px;
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .header-flex h1 {
+            margin: 0;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+        }
+
+        /* Badge contador */
+        .badge {
+            background: var(--green);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        /* Tabla de proyectos */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 14px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #f1f5f9;
+        }
+
+        .td-name {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .td-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .td-meta {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .empty-state h3 {
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .btn-orange {
+            background: var(--movilnet-orange);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .btn-orange:hover {
+            background: #e55a00;
+        }
+
+        /* Mensajes del sistema */
+        .msg {
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .msg-success {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 4px solid #22c55e;
+        }
+
+        .msg-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* Info banner */
+        .info-banner {
+            background: var(--green-light);
+            border: 1px solid #6ee7b7;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 25px;
+            font-size: 0.88rem;
+            color: #065f46;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Badges de tipo de proyecto */
+        .badge-tipo {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 0;
+        }
+
+        .badge-FRONTEND { background: #dbeafe; color: #1d4ed8; }
+        .badge-BACKEND { background: #dcfce7; color: #15803d; }
+        .badge-BASE_DE_DATOS { background: #f3e8ff; color: #7e22ce; }
+        .badge-PERSONALIZADO { background: #f1f5f9; color: #475569; }
+        .badge-DOCUMENTACION { background: #fef3c7; color: #92400e; }
+
+        /* Badge de estado finalizado */
+        .badge-finalizado {
+            background: #d1fae5;
+            color: #065f46;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Progress bar */
+        .progress-bar-wrap {
+            background: #e2e8f0;
+            border-radius: 20px;
+            height: 7px;
+            width: 100px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--green);
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'proyectos/_responsive_nav.html' %}
+
+    <aside class="sidebar">
+        <button type="button" class="sidebar-close-btn" onclick="toggleSidebar(false)" aria-label="Cerrar menú">✕</button>
+        <div class="logo">MOVILNET GESTIÓN</div>
+
+        <nav class="nav-group">
+            <span class="nav-label">PROYECTOS</span>
+            <a href="{% url 'home' %}" class="nav-link">📂 Ver Proyectos Activos</a>
+            <a href="{% url 'lista_aceptacion_proyectos' %}" class="nav-link">📋 Crear Actas</a>
+            <a href="{% url 'proyectos_inhabilitados' %}" class="nav-link">🚫 Proyectos Inhabilitados</a>
+            <a href="{% url 'proyectos_culminados' %}" class="nav-link active">🏆 Proyectos Culminados</a>
+            <a href="{% url 'revision_tareas' %}" class="nav-link" style="margin-top: 10px;">✅ Aprobar Tareas</a>
+        </nav>
+
+        <nav class="nav-group">
+            <span class="nav-label">TAREAS Y REPORTES</span>
+            <a href="{% url 'gestionar_tareas_generales' %}" class="nav-link">📄 Tareas Generales</a>
+            <a href="{% url 'lista_reportes' %}" class="nav-link">📊 Historial de Reportes</a>
+        </nav>
+
+        <nav class="nav-group">
+            <span class="nav-label">EQUIPOS</span>
+            <a href="{% url 'lista_desarrolladores' %}" class="nav-link">👥 Desarrolladores</a>
+        </nav>
+
+        <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 18px;">
+            {% include 'proyectos/_user_card.html' %}
+            <a href="{% url 'logout' %}" class="nav-link" style="color: #ef4444;">🚪 Cerrar Sesión</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="header-flex">
+            <h1>🏆 Proyectos Culminados
+                {% if proyectos %}
+                <span class="badge">{{ proyectos|length }}</span>
+                {% endif %}
+            </h1>
+            <a href="{% url 'home' %}" class="btn-orange" style="font-size:0.85rem; padding:8px 18px;">← Volver al Panel</a>
+        </div>
+        <p class="page-subtitle">Historial de proyectos que han sido completados con todas sus tareas finalizadas.</p>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="msg {% if 'success' in message.tags %}msg-success{% else %}msg-error{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Banner informativo -->
+        <div class="info-banner">
+            🏆 <span>Los proyectos culminados <strong>han completado todas sus tareas</strong> y fueron marcados como finalizados por el gerente.</span>
+        </div>
+
+        {% if proyectos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Proyecto</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Fechas</th>
+                    <th>Progreso</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proyecto in proyectos %}
+                <tr>
+                    <td class="td-name">
+                        {% if proyecto.identificador %}<span style="font-size:0.75rem; color:#94a3b8; font-weight:600;">{{ proyecto.identificador }}</span><br>{% endif %}
+                        {{ proyecto.nombre }}
+                    </td>
+                    <td>
+                        <span class="badge-tipo badge-{{ proyecto.tipo }}" style="margin: 0;">
+                            {{ proyecto.get_tipo_display_icon }} {{ proyecto.get_tipo_display }}
+                        </span>
+                    </td>
+                    <td class="td-desc">{{ proyecto.descripcion|truncatechars:60|default:"Sin descripción." }}</td>
+                    <td class="td-meta">
+                        📅 Creado: {{ proyecto.fecha_creacion|date:"d/m/Y" }}<br>
+                        {% if proyecto.fecha_tentativa %}
+                        🗓️ Tentativa: {{ proyecto.fecha_tentativa|date:"d/m/Y" }}
+                        {% else %}
+                        <span style="color:#cbd5e1;">Sin fecha tentativa</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="font-size:0.85rem; color:#065f46; font-weight:600;">{{ proyecto.num_tareas_finalizadas }}/{{ proyecto.num_total_tareas }}</span>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill" style="width:{% if proyecto.num_total_tareas > 0 %}{% widthratio proyecto.num_tareas_finalizadas proyecto.num_total_tareas 100 %}{% else %}0{% endif %}%;"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge-finalizado">✅ Finalizado</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🏁</div>
+            <h3>Aún no hay proyectos culminados</h3>
+            <p>Cuando un proyecto tenga todas sus tareas finalizadas y lo confirmes, aparecerá aquí como registro permanente.</p>
+            <a href="{% url 'home' %}" class="btn-orange">← Volver al Panel Principal</a>
+        </div>
+        {% endif %}
+    </main>
+
+    {% include 'proyectos/_timeout.html' %}
+</body>
+
+</html>

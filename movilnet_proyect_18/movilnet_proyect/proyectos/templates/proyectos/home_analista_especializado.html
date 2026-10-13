@@ -1,0 +1,426 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Analista Especializado - Movilnet</title>
+    <link rel="shortcut icon" href="{% static 'proyectos/movilnet.icon.jpg' %}">
+    <link rel="stylesheet" href="{% static 'proyectos/css/responsive.css' %}">
+    <style>
+        :root {
+            --accent: #6366f1;
+            --accent-light: #eef2ff;
+            --accent-dark: #4338ca;
+            --bg-body: #f1f5f9;
+            --text-main: #1e293b;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            display: flex;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            height: 100vh;
+            position: fixed;
+            border-right: 1px solid #e2e8f0;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 32px;
+        }
+
+        .nav-group {
+            margin-bottom: 30px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            transition: 0.3s;
+            margin-bottom: 5px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Chip de rol en el sidebar */
+        .rol-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border: 1px solid #c7d2fe;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            margin-bottom: 28px;
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 40px;
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .header-flex h1 {
+            font-size: 1.6rem;
+            margin: 0;
+        }
+
+        .header-sub {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+
+        /* Grid de proyectos */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* Tarjeta de proyecto */
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: 0.3s;
+            border: 1px solid #e2e8f0;
+            border-top: 3px solid var(--accent);
+        }
+
+        .project-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+        }
+
+        .project-card.general {
+            border-top-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .project-header h4 {
+            margin: 0 0 6px 0;
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-kanban {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 700;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-kanban:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-kanban.amber {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .btn-kanban.amber:hover {
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+        }
+
+        /* Badges de tipo */
+        .badge-tipo {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .badge-FRONTEND {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-BACKEND {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-BASE_DE_DATOS {
+            background: #f3e8ff;
+            color: #7e22ce;
+        }
+
+        .badge-PERSONALIZADO {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        /* Metadata de fechas */
+        .project-dates {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .deadline-warning {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 70px 20px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            color: var(--text-main);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .empty-state p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* Mensajes del sistema */
+        .msg {
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .msg-success {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 4px solid #22c55e;
+        }
+
+        .msg-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border-left: 4px solid #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'proyectos/_responsive_nav.html' %}
+
+    <aside class="sidebar">
+        <button type="button" class="sidebar-close-btn" onclick="toggleSidebar(false)" aria-label="Cerrar menú">✕</button>
+        <div class="logo">MOVILNET</div>
+        <div class="logo-subtitle">Analítica Avanzada</div>
+
+        <div class="rol-chip">
+            🔬 Analista Especializado
+        </div>
+
+        <nav class="nav-group">
+            <span class="nav-label">ESPACIO DE TRABAJO</span>
+            <a href="{% url 'home' %}" class="nav-link active">🔬 Mis Asignaciones</a>
+            <a href="{% url 'lista_aceptacion_proyectos' %}" class="nav-link {% if '/aceptacion-proyectos/' in request.path %}active{% endif %}">📋 Crear Actas</a>
+        </nav>
+
+        <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 18px;">
+            {% include 'proyectos/_user_card.html' %}
+            <a href="{% url 'logout' %}" class="nav-link" style="color: #ef4444;">🚪 Cerrar Sesión</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="header-flex">
+            <h1>🔬 Proyectos Asignados</h1>
+        </div>
+        <p class="header-sub">
+            Bienvenido, <strong>{{ request.user.first_name|default:request.user.username }}</strong>.
+            Aquí encontrarás los proyectos y tareas que te han sido asignados para análisis especializado.
+        </p>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="msg {% if 'success' in message.tags %}msg-success{% else %}msg-error{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if proyectos or tiene_tareas_generales %}
+        <div class="projects-grid">
+
+            {% if tiene_tareas_generales %}
+            <div class="project-card general">
+                <div class="project-header">
+                    <div>
+                        <h4 style="color: #d97706;">📝 Tareas Generales</h4>
+                        <span class="badge-tipo badge-PERSONALIZADO">🔧 Tareas sin proyecto</span>
+                    </div>
+                    <div class="project-actions">
+                        <a href="{% url 'panel_desarrollador' 0 %}" class="btn-kanban amber"
+                            title="Ver Kanban de Tareas Generales">
+                            Ver Kanban ➜
+                        </a>
+                    </div>
+                </div>
+                <p style="color:#92400e; font-size:0.88rem;">Tareas asignadas directamente por el Gerente que no
+                    pertenecen a ningún proyecto específico.</p>
+            </div>
+            {% endif %}
+
+            {% for proyecto in proyectos %}
+            <div class="project-card">
+                <div class="project-header" style="flex-direction: column; gap: 10px; align-items: stretch;">
+                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                        <div style="flex:1; min-width:0;">
+                            <h4 style="margin:0 0 5px 0; font-size:1rem; line-height:1.35; word-break:break-word; overflow-wrap:break-word; color:var(--text-main);">{{ proyecto.nombre }}</h4>
+                            <span class="badge-tipo badge-{{ proyecto.tipo }}">
+                                {{ proyecto.get_tipo_display_icon }} {{ proyecto.get_tipo_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap; border-top:1px solid #f1f5f9; padding-top:8px;">
+                        <a href="{% url 'panel_desarrollador' proyecto.id %}" class="btn-kanban"
+                            title="Ver Tablero Kanban">
+                            Ver Kanban ➜
+                        </a>
+                    </div>
+                </div>
+
+                <div class="desc-container" style="font-size:0.88rem; color:#475569; margin: 8px 0 0 0; word-break: break-word; overflow-wrap: break-word;">
+                    <p class="desc-corta" style="margin-bottom: 0;">
+                        {{ proyecto.descripcion|truncatechars:100 }}
+                        {% if proyecto.descripcion|length > 100 %}
+                        <a href="javascript:void(0);" onclick="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';" style="color: #3b82f6; font-size: 0.85em; font-weight: 600; text-decoration: none; margin-left: 5px;">Ver más</a>
+                        {% endif %}
+                    </p>
+                    <p class="desc-larga" style="display: none; margin-bottom: 0;">
+                        {{ proyecto.descripcion }}
+                        <a href="javascript:void(0);" onclick="this.parentElement.style.display='none'; this.parentElement.previousElementSibling.style.display='block';" style="color: #3b82f6; font-size: 0.85em; font-weight: 600; text-decoration: none; margin-left: 5px;">Ver menos</a>
+                    </p>
+                </div>
+
+                <div class="project-dates">
+                    <span>&#128197; Creado: {{ proyecto.fecha_creacion|date:"d/m/Y" }}</span>
+                    {% if proyecto.fecha_tentativa %}
+                    <span style="color: #0369a1; font-weight: 600;">
+                        🗓️ Fecha Tentativa: {{ proyecto.fecha_tentativa|date:"d/m/Y" }}
+                    </span>
+                    {% elif proyecto.fecha_deadline %}
+                    <span {% if proyecto.fecha_deadline < today %}class="deadline-warning" {% endif %}>
+                        🗓️ Fecha Tentativa: {{ proyecto.fecha_deadline|date:"d/m/Y" }}
+                    </span>
+                    {% else %}
+                    <span style="color:#94a3b8;">Fecha tentativa sin definir</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🔬</div>
+            <h3>No tienes asignaciones activas</h3>
+            <p>El Gerente aún no te ha asignado tareas en ningún proyecto activo.</p>
+        </div>
+        {% endif %}
+    </main>
+
+    {% include 'proyectos/_timeout.html' %}
+</body>
+
+</html>

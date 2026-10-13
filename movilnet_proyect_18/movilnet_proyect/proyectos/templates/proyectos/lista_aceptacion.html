@@ -1,0 +1,521 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if es_jefe %}Aprobación de Actas{% else %}Crear Actas{% endif %} - Movilnet</title>
+    <link rel="stylesheet" href="{% static 'proyectos/css/responsive.css' %}">
+    <style>
+        :root {
+            {% if rol == 'ANALISTA_ESPECIALIZADO' %}
+            --movilnet-orange: #6366f1;
+            --accent-bg-active: #eef2ff;
+            {% else %}
+            --movilnet-orange: #ff6600;
+            --accent-bg-active: #fff7ed;
+            {% endif %}
+            --bg-body: #f1f5f9;
+            --text-main: #1e293b;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            display: flex;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            height: 100vh;
+            position: fixed;
+            border-right: 1px solid #e2e8f0;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            color: var(--movilnet-orange);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+
+        .nav-group {
+            margin-bottom: 30px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            transition: 0.3s;
+            margin-bottom: 5px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--accent-bg-active);
+            color: var(--movilnet-orange);
+            font-weight: 600;
+        }
+
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 40px;
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .acta-table-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        table.custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table.custom-table th,
+        table.custom-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        table.custom-table th {
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .badge-PENDIENTE {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-APROBADO {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+
+        .btn-view {
+            background: #fff7ed;
+            color: var(--movilnet-orange);
+            border: 1px solid #ffedd5;
+        }
+
+        .btn-view:hover {
+            background: var(--movilnet-orange);
+            color: white;
+        }
+
+        .btn-excel {
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .btn-excel:hover {
+            background: #15803d;
+            color: white;
+        }
+
+        /* --- PANEL SELECTOR DE PROYECTO --- */
+        .selector-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px 28px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 28px;
+        }
+
+        .selector-card h2 {
+            margin: 0 0 18px 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selector-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .selector-row select {
+            flex: 1;
+            min-width: 260px;
+            padding: 10px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            color: #1e293b;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .selector-row select:focus {
+            border-color: var(--movilnet-orange);
+            background: white;
+        }
+
+        .btn-go {
+            padding: 10px 22px;
+            background: var(--movilnet-orange);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-go:hover {
+            background: #e55a00;
+        }
+
+        .proyecto-preview {
+            margin-top: 14px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: none;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .proyecto-preview.visible {
+            display: flex;
+        }
+
+        .preview-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .preview-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .preview-value {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'proyectos/_responsive_nav.html' %}
+
+    <aside class="sidebar">
+        <button type="button" class="sidebar-close-btn" onclick="toggleSidebar(false)" aria-label="Cerrar menú">✕</button>
+        {% if rol == 'DESARROLLADOR' %}
+        <div class="logo">MOVILNET DEV</div>
+
+        <nav class="nav-group">
+            <span class="nav-label">ESPACIO DE TRABAJO</span>
+            <a href="{% url 'home' %}" class="nav-link">💻 Mis Asignaciones</a>
+            <a href="{% url 'lista_aceptacion_proyectos' %}" class="nav-link active">📋 Crear Actas</a>
+        </nav>
+
+        {% elif rol == 'ANALISTA_ESPECIALIZADO' %}
+        <div class="logo" style="color: #6366f1; margin-bottom: 4px;">MOVILNET</div>
+        <div style="font-size: 0.7rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 24px;">Analítica Avanzada</div>
+
+        <div style="display: inline-flex; align-items: center; gap: 6px; background: #eef2ff; color: #6366f1; border: 1px solid #c7d2fe; border-radius: 20px; padding: 5px 12px; font-size: 0.72rem; font-weight: 700; margin-bottom: 24px;">
+            🔬 Analista Especializado
+        </div>
+
+        <nav class="nav-group">
+            <span class="nav-label">ESPACIO DE TRABAJO</span>
+            <a href="{% url 'home' %}" class="nav-link">🔬 Mis Asignaciones</a>
+            <a href="{% url 'lista_aceptacion_proyectos' %}" class="nav-link active">📋 Crear Actas</a>
+        </nav>
+
+        {% elif rol == 'ANALISTA' %}
+        <div class="logo">MOVILNET ANALÍTICA</div>
+
+        <nav class="nav-group">
+            <span class="nav-label">OBSERVACIÓN</span>
+            <a href="{% url 'home' %}" class="nav-link">📊 Ver Proyectos Activos</a>
+            <a href="{% url 'lista_aceptacion_proyectos' %}" class="nav-link active">📋 Crear Actas</a>
+        </nav>
+
+        {% elif es_jefe %}
+        <div class="logo">MOVILNET GESTIÓN</div>
+
+        <nav class="nav-group">
+            <span class="nav-label">PROYECTOS</span>
+            <a href="{% url 'home' %}" class="nav-link">📂 Ver Proyectos Activos</a>
+            <a href="{% url 'lista_aceptacion_proyectos' %}" class="nav-link active">📋 Aprobación de Actas</a>
+            <a href="{% url 'proyectos_inhabilitados' %}" class="nav-link">🚫 Proyectos Inhabilitados</a>
+            <a href="{% url 'proyectos_culminados' %}" class="nav-link">🏆 Proyectos Culminados</a>
+            <a href="{% url 'revision_tareas' %}" class="nav-link">✅ Aprobar Tareas</a>
+        </nav>
+
+        <nav class="nav-group">
+            <span class="nav-label">TAREAS Y REPORTES</span>
+            <a href="{% url 'gestionar_tareas_generales' %}" class="nav-link">📝 Tareas Generales</a>
+            <a href="{% url 'lista_reportes' %}" class="nav-link">📊 Historial de Reportes</a>
+        </nav>
+
+        <nav class="nav-group">
+            <span class="nav-label">ADMINISTRACIÓN</span>
+            <a href="{% url 'registro_jefe' %}" class="nav-link">📝 Registrar Personal</a>
+            <a href="{% url 'lista_desarrolladores' %}" class="nav-link">👥 Desarrolladores</a>
+            <a href="{% url 'lista_gerentes' %}" class="nav-link">👔 Gerentes</a>
+        </nav>
+
+        {% else %}
+        <div class="logo">MOVILNET GESTIÓN</div>
+
+        <nav class="nav-group">
+            <span class="nav-label">PROYECTOS</span>
+            <a href="{% url 'home' %}" class="nav-link">📂 Ver Proyectos Activos</a>
+            <a href="{% url 'lista_aceptacion_proyectos' %}" class="nav-link active">📋 Crear Actas</a>
+            <a href="{% url 'proyectos_inhabilitados' %}" class="nav-link">🚫 Proyectos Inhabilitados</a>
+            <a href="{% url 'revision_tareas' %}" class="nav-link">✅ Revisar Tareas</a>
+        </nav>
+
+        <nav class="nav-group">
+            <span class="nav-label">TAREAS Y REPORTES</span>
+            <a href="{% url 'gestionar_tareas_generales' %}" class="nav-link">📝 Tareas Generales</a>
+            <a href="{% url 'lista_reportes' %}" class="nav-link">📊 Historial de Reportes</a>
+        </nav>
+
+        <nav class="nav-group">
+            <span class="nav-label">EQUIPOS</span>
+            <a href="{% url 'lista_desarrolladores' %}" class="nav-link">👥 Desarrolladores</a>
+        </nav>
+        {% endif %}
+
+        <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 18px;">
+            {% include 'proyectos/_user_card.html' %}
+            <a href="{% url 'logout' %}" class="nav-link" style="color: #ef4444;">🚪 Cerrar Sesión</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="header-flex">
+            <h1>{% if es_jefe %}📋 Aprobación de Actas{% else %}📋 Crear Actas{% endif %} (Actas de Recepción)</h1>
+        </div>
+
+        <!-- PANEL: SELECCIONAR PROYECTO PARA CREAR/VER ACTA -->
+        {% if not es_jefe %}
+        <div class="selector-card">
+            <h2>📂 Seleccionar Proyecto para Crear / Ver Acta</h2>
+            <div class="selector-row">
+                <select id="proyecto-selector" onchange="mostrarPreview()">
+                    <option value="">-- Seleccione un proyecto --</option>
+                    {% for p in proyectos %}
+                    <option
+                        value="{% url 'ver_acta_aceptacion' p.id %}"
+                        data-id="{{ p.identificador|default:'-' }}"
+                        data-nombre="{{ p.nombre }}"
+                        data-gerencia="{{ p.gerencia.nombre|default:'Sin gerencia' }}"
+                        data-fecha="{{ p.fecha_creacion|date:'d/m/Y' }}"
+                        data-tipo="{{ p.get_tipo_display }}"
+                    >
+                        {{ p.identificador|default:'-' }} — {{ p.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button class="btn-go" onclick="irAlActa()">Ver / Crear Acta →</button>
+            </div>
+
+            <!-- Preview de datos del proyecto seleccionado -->
+            <div class="proyecto-preview" id="proyecto-preview">
+                <div class="preview-item">
+                    <span class="preview-label">ID Proyecto</span>
+                    <span class="preview-value" id="prev-id">-</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">Nombre</span>
+                    <span class="preview-value" id="prev-nombre">-</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">Gerencia</span>
+                    <span class="preview-value" id="prev-gerencia">-</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">Tipo</span>
+                    <span class="preview-value" id="prev-tipo">-</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">Fecha de Creación</span>
+                    <span class="preview-value" id="prev-fecha">-</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if messages %}
+        {% for message in messages %}
+        <div style="padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; background: #dcfce7; color: #166534; border-left: 4px solid #22c55e;">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="acta-table-card">
+            {% if actas %}
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Proyecto</th>
+                        <th>Fecha Creación</th>
+                        <th>Estado de Aceptación</th>
+                        <th>Aprobado Por</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in actas %}
+                    <tr>
+                        <td><strong>{{ item.proyecto.identificador|default:'-' }}</strong></td>
+                        <td>
+                            <strong>{{ item.proyecto.nombre }}</strong>
+                            {% if item.acta.siglas_solucion %}
+                            <div style="font-size: 0.78rem; color: #64748b;">Siglas: {{ item.acta.siglas_solucion }}</div>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.acta.fecha|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="badge-status badge-{{ item.acta.estado }}">
+                                {{ item.acta.get_estado_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if item.acta.aprobado_por %}
+                            {{ item.acta.aprobado_por.get_full_name|default:item.acta.aprobado_por.username }}
+                            <div style="font-size: 0.75rem; color: #64748b;">{{ item.acta.fecha_aprobacion|date:"d/m/Y" }}</div>
+                            {% else %}
+                            <span style="color: #94a3b8; font-style: italic;">Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td style="white-space: nowrap; display: flex; gap: 6px; align-items: center;">
+                            <a href="{% url 'ver_acta_aceptacion' item.proyecto.id %}" class="btn-action btn-view" title="Ver / Imprimir Acta">
+                                📄 Ver / Imprimir
+                            </a>
+                            <a href="{% url 'descargar_acta_excel' item.proyecto.id %}" class="btn-action btn-excel" title="Descargar en Excel (.xlsx)">
+                                📊 Excel
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div style="text-align: center; padding: 40px; color: #64748b;">
+                <h3>No hay proyectos o actas disponibles</h3>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    {% include 'proyectos/_timeout.html' %}
+
+    <script>
+        function mostrarPreview() {
+            const sel = document.getElementById('proyecto-selector');
+            const opt = sel.options[sel.selectedIndex];
+            const preview = document.getElementById('proyecto-preview');
+
+            if (!sel.value) {
+                preview.classList.remove('visible');
+                return;
+            }
+
+            document.getElementById('prev-id').textContent      = opt.dataset.id      || '-';
+            document.getElementById('prev-nombre').textContent  = opt.dataset.nombre  || '-';
+            document.getElementById('prev-gerencia').textContent= opt.dataset.gerencia|| '-';
+            document.getElementById('prev-tipo').textContent    = opt.dataset.tipo    || '-';
+            document.getElementById('prev-fecha').textContent   = opt.dataset.fecha   || '-';
+            preview.classList.add('visible');
+        }
+
+        function irAlActa() {
+            const url = document.getElementById('proyecto-selector').value;
+            if (!url) {
+                alert('Por favor seleccione un proyecto primero.');
+                return;
+            }
+            window.location.href = url;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,774 @@
+{% load static notif_tags %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerente de Proyectos - Movilnet</title>
+    <link rel="stylesheet" href="{% static 'proyectos/css/responsive.css' %}">
+    <style>
+        :root {
+            --movilnet-orange: #ff6600;
+            --bg-body: #f1f5f9;
+            --text-main: #1e293b;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            display: flex;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            height: 100vh;
+            position: fixed;
+            border-right: 1px solid #e2e8f0;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            color: var(--movilnet-orange);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+
+        .nav-group {
+            margin-bottom: 30px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* Enlaces de navegación */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            transition: 0.3s;
+            margin-bottom: 5px;
+        }
+
+        /* Efecto cuando pasas el ratón o la página está activa */
+        .nav-link:hover,
+        .nav-link.active {
+            background: #fff7ed;
+            color: var(--movilnet-orange);
+            font-weight: 600;
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 40px;
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        /* Botón Naranja */
+        .btn-orange {
+            background: var(--movilnet-orange);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* Grid de proyectos */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* Tarjeta de proyecto */
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .project-header h4 {
+            margin: 0;
+            color: var(--text-main);
+            font-size: 1rem;
+            line-height: 1.35;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .project-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            flex-shrink: 0;
+            justify-content: flex-end;
+            max-width: 180px;
+        }
+
+        .btn-outline {
+            background: #f8fafc;
+            color: var(--text-main);
+            padding: 5px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.82rem;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            height: 30px;
+            line-height: 1;
+        }
+
+        .btn-outline:hover {
+            background: var(--movilnet-orange);
+            color: white;
+            border-color: var(--movilnet-orange);
+            transform: scale(1.08);
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state h3 {
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        /* Mensajes del sistema */
+        .msg {
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .msg-success {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 4px solid #22c55e;
+        }
+
+        .msg-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* Badges de tipo de proyecto */
+        .badge-tipo {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .badge-FRONTEND {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-BACKEND {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-BASE_DE_DATOS {
+            background: #f3e8ff;
+            color: #7e22ce;
+        }
+
+        .badge-PERSONALIZADO {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        /* Metadata de fechas */
+        .project-dates {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .deadline-warning {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        /* Badge de notificación en sidebar */
+        .nav-badge {
+            margin-left: auto;
+            background: #ef4444;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 20px;
+            min-width: 18px;
+            text-align: center;
+            animation: pulse-badge 2s infinite;
+        }
+
+        @keyframes pulse-badge {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15);
+            }
+        }
+
+        /* Banner de alerta de revisión */
+        .review-alert {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border: 1.5px solid #fb923c;
+            border-left: 5px solid #ff6600;
+            border-radius: 12px;
+            padding: 16px 22px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 10px rgba(255, 102, 0, 0.1);
+            animation: slide-in 0.4s ease;
+        }
+
+        @keyframes slide-in {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .review-alert-icon {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .review-alert-body {
+            flex: 1;
+        }
+
+        .review-alert-body strong {
+            display: block;
+            font-size: 1rem;
+            color: #7c2d12;
+            margin-bottom: 3px;
+        }
+
+        .review-alert-body span {
+            font-size: 0.875rem;
+            color: #9a3412;
+        }
+
+        .btn-go-review {
+            background: #ff6600;
+            color: white;
+            text-decoration: none;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-go-review:hover {
+            background: #cc5200;
+            transform: translateY(-1px);
+        }
+
+        /* Campanita de Notificaciones de Proyecto */
+        .notif-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .btn-bell-notif {
+            position: relative;
+            background: #fff;
+            border: 1.5px solid #fde68a;
+            color: #d97706;
+            font-size: 1.05rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .btn-bell-notif:hover {
+            background: #fef3c7;
+            transform: translateY(-1px);
+        }
+
+        .bell-badge-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.62rem;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 20px;
+            min-width: 15px;
+            height: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 2px white;
+            animation: pulse-badge 2s infinite;
+        }
+
+        .proj-notif-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 320px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slide-in 0.2s ease;
+        }
+
+        .proj-notif-menu.active {
+            display: flex;
+        }
+
+        .proj-notif-header {
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .proj-notif-header strong {
+            font-size: 0.82rem;
+            color: #1e293b;
+        }
+
+        .btn-read-all {
+            background: #ff6600;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-read-all:hover {
+            background: #cc5200;
+        }
+
+        .proj-notif-body {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .proj-notif-row {
+            display: flex;
+            gap: 10px;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: 0.2s;
+        }
+
+        .proj-notif-row:hover {
+            background: #f8fafc;
+        }
+
+        .proj-notif-row.unread {
+            background: #fff7ed;
+            border-left: 3.5px solid #ff6600;
+        }
+
+        .proj-notif-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .proj-notif-desc {
+            font-size: 0.8rem;
+            color: #334155;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .proj-notif-time {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'proyectos/_responsive_nav.html' %}
+
+    <aside class="sidebar">
+        <button type="button" class="sidebar-close-btn" onclick="toggleSidebar(false)" aria-label="Cerrar menú">✕</button>
+        <div class="logo">MOVILNET GESTIÓN</div>
+
+        <nav class="nav-group">
+            <span class="nav-label">PROYECTOS</span>
+            <a href="{% url 'home' %}" class="nav-link {% if request.path == '/' or request.path == '/home/' %}active{% endif %}">📂 Ver Proyectos Activos</a>
+            <a href="{% url 'lista_aceptacion_proyectos' %}" class="nav-link {% if '/lista-aceptacion/' in request.path %}active{% endif %}">📋 Crear Actas</a>
+            <a href="{% url 'proyectos_inhabilitados' %}" class="nav-link {% if '/proyectos-inhabilitados/' in request.path %}active{% endif %}">🚫 Proyectos Inhabilitados</a>
+            <a href="{% url 'proyectos_culminados' %}" class="nav-link {% if '/proyectos-culminados/' in request.path %}active{% endif %}">🏆 Proyectos Culminados</a>
+            <a href="{% url 'revision_tareas' %}" class="nav-link {% if '/revision-tareas/' in request.path %}active{% endif %}" style="margin-top: 10px;">
+                ✅ Aprobar Tareas
+                {% if tareas_en_revision > 0 %}
+                <span class="nav-badge">{{ tareas_en_revision }}</span>
+                {% endif %}
+            </a>
+        </nav>
+
+        <nav class="nav-group">
+            <span class="nav-label">TAREAS Y REPORTES</span>
+            <a href="{% url 'gestionar_tareas_generales' %}" class="nav-link {% if '/tareas-generales/' in request.path %}active{% endif %}">📝 Tareas Generales</a>
+            <a href="{% url 'lista_reportes' %}" class="nav-link {% if '/lista-reportes/' in request.path %}active{% endif %}">📊 Historial de Reportes</a>
+        </nav>
+
+        <nav class="nav-group">
+            <span class="nav-label">EQUIPOS</span>
+            <a href="{% url 'lista_desarrolladores' %}" class="nav-link {% if '/desarrolladores/' in request.path %}active{% endif %}">👥 Desarrolladores</a>
+        </nav>
+
+        <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 18px;">
+            {% include 'proyectos/_user_card.html' %}
+            <a href="{% url 'logout' %}" class="nav-link" style="color: #ef4444;">🚪 Cerrar Sesión</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="header-flex">
+            <h1>📂 Mis Proyectos</h1>
+            <a href="{% url 'crear_proyecto' %}" class="btn-orange">+ Crear Proyecto</a>
+        </div>
+
+        {% if tareas_en_revision > 0 %}
+        <div class="review-alert">
+            <div class="review-alert-icon">🔔</div>
+            <div class="review-alert-body">
+                <strong>
+                    {% if tareas_en_revision == 1 %}1 tarea esperando revisión{% else %}{{ tareas_en_revision }} tareas
+                    esperando revisión{% endif %}
+                </strong>
+                <span>Un desarrollador ha enviado trabajo para que lo revises y apruebes.</span>
+            </div>
+            <a href="{% url 'revision_tareas' %}" class="btn-go-review">Ver Tareas →</a>
+        </div>
+        {% endif %}
+
+        <!-- Mensajes del sistema -->
+        {% if messages %}
+        {% for message in messages %}
+        <div class="msg {% if 'success' in message.tags %}msg-success{% else %}msg-error{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if proyectos %}
+        <div class="projects-grid">
+            {% for proyecto in proyectos %}
+            <div class="project-card">
+                <div class="project-header" style="flex-direction: column; gap: 10px; align-items: stretch;">
+                    <!-- Título, badge y campanita de notificaciones -->
+                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                        <div style="flex:1; min-width:0;">
+                            <h4 style="margin:0 0 5px 0; font-size:1rem; line-height:1.35; word-break:break-word; overflow-wrap:break-word; color:var(--text-main);">{{ proyecto.nombre }}</h4>
+                            <span class="badge-tipo badge-{{ proyecto.tipo }}">
+                                {{ proyecto.get_tipo_display_icon }} {{ proyecto.get_tipo_display }}
+                            </span>
+                        </div>
+
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <!-- Botón Finalizar Proyecto -->
+                            {% if proyecto.todas_tareas_finalizadas %}
+                            <form action="{% url 'finalizar_proyecto' proyecto.id %}" method="POST" style="margin:0;" onsubmit="return confirm('¿Estás seguro de que deseas finalizar este proyecto? (Esto lo removerá de los proyectos activos y registrará su finalización)');">
+                                {% csrf_token %}
+                                <button type="submit" style="background-color: #10b981; color: white; border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display:flex; align-items:center; gap:4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#059669'" onmouseout="this.style.backgroundColor='#10b981'" title="Finalizar Proyecto">
+                                    ✅ Finalizar
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            <!-- Campanita de Notificación de este Proyecto -->
+                            <div class="notif-container">
+                                <button type="button" class="btn-bell-notif" onclick="toggleProjNotif('proj-notif-{{ proyecto.id }}', event)" title="Notificaciones de este proyecto">
+                                🔔
+                                {% with unread_count=proyecto|notif_count:request.user %}
+                                {% if unread_count > 0 %}
+                                <span class="bell-badge-count">{{ unread_count }}</span>
+                                {% endif %}
+                            </button>
+                            <div id="proj-notif-{{ proyecto.id }}" class="proj-notif-menu">
+                                <div class="proj-notif-header">
+                                    <strong>🔔 Notificaciones ({{ unread_count }} pendientes)</strong>
+                                    {% if unread_count > 0 %}
+                                    <form action="{% url 'marcar_notificaciones_proyecto' proyecto.id %}" method="POST" style="margin:0;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-read-all">Marcar leídas</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                                <div class="proj-notif-body">
+                                    {% for notif in proyecto|notif_list:request.user %}
+                                    <div class="proj-notif-row {% if not notif.leida %}unread{% endif %}">
+                                        <div class="proj-notif-icon">
+                                            {% if notif.tipo == 'COMENTARIO' %}💬{% elif notif.tipo == 'TAREA_FINALIZADA' %}✅{% elif notif.tipo == 'PROYECTO_FINALIZADO' %}🏆{% else %}📌{% endif %}
+                                        </div>
+                                        <div style="flex:1;">
+                                            <div class="proj-notif-desc">{{ notif.mensaje }}</div>
+                                            <div class="proj-notif-time">{{ notif.fecha_creacion|timesince }} atrás</div>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div style="padding:16px; text-align:center; color:#94a3b8; font-size:0.82rem;">
+                                        Sin notificaciones en este proyecto.
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endwith %}
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <!-- Botones de acción alineados en fila ordenada -->
+                    <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap; border-top:1px solid #f1f5f9; padding-top:8px;">
+                        <a href="{% url 'ver_acta_aceptacion' proyecto.id %}" class="btn-outline"
+                            title="Acta de Recepción" style="color:#ea580c;">📜</a>
+                        <a href="{% url 'gestionar_asignaciones' proyecto.id %}" class="btn-outline"
+                            style="color:#22c55e;" title="Gestionar Tareas">&#10133;</a>
+                        <a href="{% url 'panel_desarrollador' proyecto.id %}" class="btn-outline"
+                            title="Ver Panel Kanban">&#128065;&#65039;</a>
+                        <a href="{% url 'generar_reporte' proyecto.id %}" class="btn-outline"
+                            title="Reporte PDF" target="_blank" style="color:#ff6600;">📄</a>
+                        <a href="{% url 'editar_proyecto' proyecto.pk %}" class="btn-outline"
+                            title="Editar proyecto">&#9999;&#65039;</a>
+                        <form action="{% url 'inhabilitar_proyecto' proyecto.pk %}" method="POST" style="display:inline; margin:0; padding:0;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-outline" style="color:#ef4444; cursor:pointer;"
+                                title="Inhabilitar proyecto"
+                                onclick="return confirm('¿Inhabilitar el proyecto &quot;{{ proyecto.nombre }}&quot;?\nPodrás restaurarlo desde Proyectos Inhabilitados.');">
+                                &#128683;
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="desc-container" style="word-break: break-word; overflow-wrap: break-word;">
+                    <p class="desc-corta" style="margin-bottom: 0;">
+                        {{ proyecto.descripcion|truncatechars:100 }}
+                        {% if proyecto.descripcion|length > 100 %}
+                        <a href="javascript:void(0);" onclick="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';" style="color: #3b82f6; font-size: 0.85em; font-weight: 600; text-decoration: none; margin-left: 5px;">Ver más</a>
+                        {% endif %}
+                    </p>
+                    <p class="desc-larga" style="display: none; margin-bottom: 0;">
+                        {{ proyecto.descripcion }}
+                        <a href="javascript:void(0);" onclick="this.parentElement.style.display='none'; this.parentElement.previousElementSibling.style.display='block';" style="color: #3b82f6; font-size: 0.85em; font-weight: 600; text-decoration: none; margin-left: 5px;">Ver menos</a>
+                    </p>
+                </div>
+
+                <!-- Sección de Módulos (Subproyectos) -->
+                <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #e2e8f0; margin-bottom: 12px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="font-size: 0.85rem; color: #475569;">🧩 Módulos ({{ proyecto.modulos.count }}):</strong>
+                        <a href="{% url 'crear_modulo' proyecto.id %}"
+                            style="font-size: 0.8rem; color: var(--movilnet-orange); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 2px;">
+                            <span>+ Agregar Módulo</span>
+                        </a>
+                    </div>
+                    {% if proyecto.modulos.all %}
+                    <div
+                        style="display: flex; flex-direction: column; gap: 6px; max-height: 150px; overflow-y: auto; padding-right: 4px;">
+                        {% for modulo in proyecto.modulos.all %}
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9; font-size: 0.8rem;">
+                            <span style="font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">
+                                <span>{{ modulo.get_tipo_display_icon }}</span>
+                                <a href="{% url 'panel_desarrollador' modulo.id %}"
+                                    style="text-decoration: none; color: var(--text-main); font-weight: 600;"
+                                    title="Ver Panel de Desarrollador">{{ modulo.nombre }}</a>
+                            </span>
+                            <div style="display: flex; gap: 6px;">
+                                <a href="{% url 'gestionar_asignaciones' modulo.id %}" class="btn-outline"
+                                    style="color: #22c55e; padding: 2px 5px; font-size: 0.75rem;"
+                                    title="Gestionar Asignaciones">&#10133;</a>
+                                <a href="{% url 'panel_desarrollador' modulo.id %}" class="btn-outline"
+                                    style="color: var(--text-main); padding: 2px 5px; font-size: 0.75rem;"
+                                    title="Ver Kanban">&#128065;&#65039;</a>
+                                <a href="{% url 'editar_proyecto' modulo.pk %}" class="btn-outline"
+                                    style="color: #475569; padding: 2px 5px; font-size: 0.75rem;"
+                                    title="Editar">&#9999;&#65039;</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p style="font-size: 0.75rem; color: #94a3b8; margin: 0; font-style: italic;">Sin módulos asociados
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div class="project-dates">
+                    <span>&#128197; Creado: {{ proyecto.fecha_creacion|date:"d/m/Y" }}</span>
+                    {% if proyecto.fecha_tentativa %}
+                    <span style="color: #0369a1; font-weight: 600;">
+                        🗓️ Fecha Tentativa: {{ proyecto.fecha_tentativa|date:"d/m/Y" }}
+                    </span>
+                    {% elif proyecto.fecha_deadline %}
+                    <span {% if proyecto.fecha_deadline < today %}class="deadline-warning" {% endif %}>
+                        🗓️ Fecha Tentativa: {{ proyecto.fecha_deadline|date:"d/m/Y" }}
+                    </span>
+                    {% else %}
+                    <span style="color:#94a3b8;">Fecha tentativa sin definir</span>
+                    {% endif %}
+                </div>
+
+                <div class="project-meta">
+                    <span>Tareas: {{ proyecto.total_tareas }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No tienes proyectos activos</h3>
+            <p>¡Crea tu primer proyecto para comenzar!</p>
+            <a href="{% url 'crear_proyecto' %}" class="btn-orange">Crear Proyecto</a>
+        </div>
+        {% endif %}
+    </main>
+
+    <script>
+        function toggleProjNotif(id, event) {
+            if (event) event.stopPropagation();
+            const target = document.getElementById(id);
+            if (!target) return;
+            const isOpen = target.classList.contains('active');
+            document.querySelectorAll('.proj-notif-menu').forEach(function(m) {
+                m.classList.remove('active');
+            });
+            if (!isOpen) {
+                target.classList.add('active');
+            }
+        }
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.notif-container')) {
+                document.querySelectorAll('.proj-notif-menu').forEach(function(m) {
+                    m.classList.remove('active');
+                });
+            }
+        });
+    </script>
+    {% include 'proyectos/_timeout.html' %}
+</body>
+
+</html>

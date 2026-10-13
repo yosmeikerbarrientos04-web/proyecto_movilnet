@@ -1,0 +1,37 @@
+<!-- Barra superior móvil (Hamburguesa) -->
+<header class="mobile-topbar">
+    <a href="{% url 'home' %}" class="mobile-logo">MOVILNET GESTIÓN</a>
+    <button type="button" class="btn-hamburger" id="btn-toggle-sidebar" onclick="toggleSidebar(true)" aria-label="Abrir menú de navegación">
+        ☰
+    </button>
+</header>
+
+<!-- Fondo oscuro (overlay) para cerrar el menú en móviles -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+
+<script>
+    function toggleSidebar(open) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (!sidebar) return;
+
+        if (open === undefined) {
+            open = !sidebar.classList.contains('open');
+        }
+
+        if (open) {
+            sidebar.classList.add('open');
+            if (overlay) overlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Evita scroll de fondo
+        } else {
+            sidebar.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    // Cerrar sidebar al presionar ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') toggleSidebar(false);
+    });
+</script>

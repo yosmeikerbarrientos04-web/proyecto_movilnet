@@ -1,0 +1,42 @@
+<!-- Perfil del usuario -->
+{% if request.user.perfil.rol_maestro.name|upper == "ANALISTA ESPECIALIZADO" or rol == "ANALISTA_ESPECIALIZADO" %}
+<div style="background: #f5f3ff; border: 1px solid #c7d2fe; border-radius: 14px; padding: 14px 14px 12px 14px; margin-bottom: 15px;">
+    <div style="display:flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+        <div style="width: 44px; height: 44px; background: linear-gradient(135deg, #6366f1, #818cf8); border-radius: 50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:1.1rem; flex-shrink:0; box-shadow: 0 2px 8px rgba(99,102,241,0.3);">
+            {% if request.user.first_name %}{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}{% else %}{{ request.user.username|slice:":2"|upper }}{% endif %}
+        </div>
+        <div style="overflow: hidden; flex:1;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: #1e293b; line-height: 1.25; word-break: break-word;">
+                {{ request.user.first_name|default:request.user.username }} {{ request.user.last_name }}
+            </div>
+            <span style="display:inline-block; font-size: 0.68rem; color: #4338ca; font-weight: 700; background: #fff; border: 1px solid #c7d2fe; border-radius: 20px; padding: 1px 8px; margin-top: 3px; letter-spacing: 0.5px;">ANALISTA ESPECIALIZADO</span>
+        </div>
+    </div>
+    {% if request.user.perfil.gerencia %}
+    <div style="display:flex; align-items:flex-start; gap:6px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding: 8px 10px;">
+        <span style="font-size:1rem; flex-shrink:0;">🏢</span>
+        <span style="font-size: 0.70rem; color: #334155; font-weight: 600; line-height: 1.4;">{{ request.user.perfil.gerencia.nombre }}</span>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<div style="background: #fff7f0; border: 1px solid #ffd6b3; border-radius: 14px; padding: 14px 14px 12px 14px; margin-bottom: 15px;">
+    <div style="display:flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+        <div style="width: 44px; height: 44px; background: linear-gradient(135deg, #ff6600, #ff9a44); border-radius: 50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:1.1rem; flex-shrink:0; box-shadow: 0 2px 8px rgba(255,102,0,0.3);">
+            {% if request.user.first_name %}{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}{% else %}{{ request.user.username|slice:":2"|upper }}{% endif %}
+        </div>
+        <div style="overflow: hidden; flex:1;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: #1e293b; line-height: 1.25; word-break: break-word;">
+                {{ request.user.first_name|default:request.user.username }} {{ request.user.last_name }}
+            </div>
+            <span style="display:inline-block; font-size: 0.68rem; color: #ff6600; font-weight: 700; background: #fff; border: 1px solid #ffd6b3; border-radius: 20px; padding: 1px 8px; margin-top: 3px; letter-spacing: 0.5px;">{{ request.user.perfil.rol_maestro.name|upper|default:"USUARIO" }}</span>
+        </div>
+    </div>
+    {% if request.user.perfil.gerencia %}
+    <div style="display:flex; align-items:flex-start; gap:6px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding: 8px 10px;">
+        <span style="font-size:1rem; flex-shrink:0;">🏢</span>
+        <span style="font-size: 0.70rem; color: #334155; font-weight: 600; line-height: 1.4;">{{ request.user.perfil.gerencia.nombre }}</span>
+    </div>
+    {% endif %}
+</div>
+{% endif %}

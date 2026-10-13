@@ -1,0 +1,837 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas de Desarrolladores - Movilnet</title>
+    <link rel="stylesheet" href="{% static 'proyectos/css/responsive.css' %}">
+    <style>
+        :root {
+            --movilnet-orange: #ff6600;
+            --bg-body: #f1f5f9;
+            --text-main: #1e293b;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            display: flex;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            height: 100vh;
+            position: fixed;
+            border-right: 1px solid #e2e8f0;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            color: var(--movilnet-orange);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+
+        .nav-group {
+            margin-bottom: 30px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            transition: 0.3s;
+            margin-bottom: 5px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #fff7ed;
+            color: var(--movilnet-orange);
+            font-weight: 600;
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 40px;
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            color: #64748b;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            text-align: left;
+            padding: 15px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.95rem;
+        }
+
+        .dev-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dev-avatar {
+            width: 35px;
+            height: 35px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #475569;
+        }
+
+        .stat-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .stat-total {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .stat-pending {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .stat-process {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .stat-review {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .stat-finished {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: #ef4444;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 20px;
+            min-width: 18px;
+            text-align: center;
+            animation: pulse-badge 2s infinite;
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.15);
+            }
+        }
+
+        .btn-back {
+            display: inline-block;
+            padding: 10px 20px;
+            background: white;
+            color: var(--text-main);
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        /* --- BOTÓN DE PROYECTOS EN TABLA --- */
+        .btn-proyectos {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff7ed;
+            color: var(--movilnet-orange);
+            border: 1.5px solid #fed7aa;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(255, 102, 0, 0.08);
+        }
+
+        .btn-proyectos:hover {
+            background: var(--movilnet-orange);
+            color: white;
+            border-color: var(--movilnet-orange);
+            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-proyectos:hover .badge-proyectos-count {
+            background: white;
+            color: var(--movilnet-orange);
+        }
+
+        .badge-proyectos-count {
+            background: var(--movilnet-orange);
+            color: white;
+            padding: 2px 7px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            min-width: 14px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-proyectos-empty {
+            background: #f8fafc;
+            color: #94a3b8;
+            border-color: #e2e8f0;
+            box-shadow: none;
+        }
+
+        .btn-proyectos-empty .badge-proyectos-count {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .btn-proyectos-empty:hover {
+            background: #f1f5f9;
+            color: #64748b;
+            border-color: #cbd5e1;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-proyectos-empty:hover .badge-proyectos-count {
+            background: #cbd5e1;
+            color: #475569;
+        }
+
+        /* --- SLIDE-OVER DRAWER (PANEL LATERAL) --- */
+        .drawer-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            z-index: 998;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .drawer-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .drawer-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 560px;
+            max-width: 92vw;
+            height: 100vh;
+            background: white;
+            z-index: 999;
+            box-shadow: -10px 0 35px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-sizing: border-box;
+        }
+
+        .drawer-panel.active {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+        }
+
+        .drawer-header-dev {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .drawer-header-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #ff6600, #ff9a44);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 800;
+            box-shadow: 0 3px 10px rgba(255, 102, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .drawer-close {
+            background: #f1f5f9;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .drawer-close:hover {
+            background: #fee2e2;
+            color: #ef4444;
+            transform: rotate(90deg);
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 28px;
+            background: #f8fafc;
+        }
+
+        .drawer-footer {
+            padding: 16px 28px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Tarjetas de Proyecto en el Drawer */
+        .project-drawer-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            transition: all 0.25s ease;
+        }
+
+        .project-drawer-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+            transform: translateY(-2px);
+        }
+
+        .project-drawer-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .project-drawer-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-tipo {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .badge-FRONTEND { background: #dbeafe; color: #1d4ed8; }
+        .badge-BACKEND { background: #dcfce7; color: #15803d; }
+        .badge-BASE_DE_DATOS { background: #f3e8ff; color: #7e22ce; }
+        .badge-DOCUMENTACION { background: #fef3c7; color: #b45309; }
+        .badge-PERSONALIZADO { background: #f1f5f9; color: #475569; }
+
+        .module-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            color: #6366f1;
+            background: #eef2ff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        /* Barra de Progreso */
+        .progress-wrapper {
+            margin: 14px 0 16px 0;
+        }
+
+        .progress-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+            color: #64748b;
+        }
+
+        .progress-percent {
+            font-weight: 800;
+            font-size: 0.85rem;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Mini chips de estado de tareas */
+        .stats-pill-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .mini-pill {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mini-pill-total { background: #f1f5f9; color: #475569; }
+        .mini-pill-pending { background: #fef2f2; color: #dc2626; }
+        .mini-pill-process { background: #fffbeb; color: #d97706; }
+        .mini-pill-review { background: #eff6ff; color: #2563eb; }
+        .mini-pill-finished { background: #f0fdf4; color: #16a34a; }
+
+        .project-drawer-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .btn-enter-project {
+            flex: 1;
+            text-align: center;
+            background: var(--movilnet-orange);
+            color: white;
+            padding: 9px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-enter-project:hover {
+            background: #cc5200;
+            box-shadow: 0 4px 10px rgba(255, 102, 0, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-parent-project {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+            border: 1px solid #d1d5db;
+            white-space: nowrap;
+        }
+
+        .btn-parent-project:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'proyectos/_responsive_nav.html' %}
+
+    <aside class="sidebar">
+        <button type="button" class="sidebar-close-btn" onclick="toggleSidebar(false)" aria-label="Cerrar menú">✕</button>
+        <div class="logo">MOVILNET GESTIÓN</div>
+
+        <nav class="nav-group">
+            <span class="nav-label">PROYECTOS</span>
+            <a href="{% url 'home' %}" class="nav-link">📂 Ver Proyectos Activos</a>
+            <a href="{% url 'proyectos_inhabilitados' %}" class="nav-link">🚫 Proyectos Inhabilitados</a>
+            <a href="{% url 'proyectos_culminados' %}" class="nav-link">🏆 Proyectos Culminados</a>
+            <a href="{% url 'revision_tareas' %}" class="nav-link" style="margin-top: 10px;">
+                ✅ Aprobar Tareas
+                {% if tareas_en_revision > 0 %}
+                <span class="nav-badge">{{ tareas_en_revision }}</span>
+                {% endif %}
+            </a>
+        </nav>
+
+        <nav class="nav-group">
+            <span class="nav-label">TAREAS Y REPORTES</span>
+            <a href="{% url 'gestionar_tareas_generales' %}" class="nav-link">📝 Tareas Generales</a>
+            <a href="{% url 'lista_reportes' %}" class="nav-link">📊 Historial de Reportes</a>
+        </nav>
+
+        {% if rol == 'JEFE' %}
+        <nav class="nav-group">
+            <span class="nav-label">ADMINISTRACIÓN</span>
+            <a href="{% url 'registro_jefe' %}" class="nav-link">📝 Registrar Personal</a>
+            <a href="{% url 'lista_desarrolladores' %}" class="nav-link active">👥 Desarrolladores</a>
+            <a href="{% url 'lista_gerentes' %}" class="nav-link">👔 Gerentes</a>
+        </nav>
+        {% else %}
+        <nav class="nav-group">
+            <span class="nav-label">EQUIPOS</span>
+            <a href="{% url 'lista_desarrolladores' %}" class="nav-link active">👥 Desarrolladores</a>
+        </nav>
+        {% endif %}
+
+        <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 18px;">
+            {% include 'proyectos/_user_card.html' %}
+            <a href="{% url 'logout' %}" class="nav-link" style="color: #ef4444;">🚪 Cerrar Sesión</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="header-flex">
+            <div>
+                <h1>👥 Estadísticas de Desarrolladores</h1>
+                <p style="color: #64748b; margin: 0;">Resumen de actividad por cada miembro del equipo.</p>
+            </div>
+            <a href="{% url 'home' %}" class="btn-back">← Volver al Dashboard</a>
+        </div>
+
+        <div class="card desarrolladores-table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Desarrollador</th>
+                        <th>Gerencia</th>
+                        <th>Proyectos</th>
+                        <th>Total Tareas</th>
+                        <th>Pendientes</th>
+                        <th>En Proceso</th>
+                        <th>En Revisión</th>
+                        <th>Finalizadas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>
+                            <div class="dev-info">
+                                <div class="dev-avatar">{{ usuario.username|slice:":1"|upper }}</div>
+                                <div>
+                                    <div style="font-weight: 600;">{{ usuario.first_name }} {{ usuario.last_name }}</div>
+                                    <div style="font-size: 0.8rem; color: #64748b;">@{{ usuario.username }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span style="font-size: 0.8rem; background: #e2e8f0; color: #334155; padding: 3px 8px; border-radius: 6px; font-weight: 600;">
+                                {{ usuario.perfil.gerencia.nombre|default:"Sin Gerencia" }}
+                            </span>
+                        </td>
+                        <td>
+                            <button type="button" 
+                                    class="btn-proyectos {% if usuario.proyectos_asignados|length == 0 %}btn-proyectos-empty{% endif %}" 
+                                    onclick="abrirDrawerProyectos('{{ usuario.id }}')"
+                                    title="Ver proyectos asignados y avance">
+                                <span style="font-size: 1rem;">📁</span>
+                                <span>Proyectos</span>
+                                <span class="badge-proyectos-count">{{ usuario.proyectos_asignados|length }}</span>
+                            </button>
+                        </td>
+                        <td><span class="stat-badge stat-total">{{ usuario.total_tareas }}</span></td>
+                        <td><span class="stat-badge stat-pending">{{ usuario.tareas_pendientes }}</span></td>
+                        <td><span class="stat-badge stat-process">{{ usuario.tareas_en_proceso }}</span></td>
+                        <td><span class="stat-badge stat-review">{{ usuario.tareas_en_revision }}</span></td>
+                        <td><span class="stat-badge stat-finished">{{ usuario.tareas_finalizadas }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #64748b;">
+                            No hay desarrolladores registrados en el sistema.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- BACKDROP DIFUMINADO -->
+    <div id="drawer-backdrop" class="drawer-backdrop" onclick="cerrarDrawerProyectos()"></div>
+
+    <!-- SLIDE-OVER DRAWER (PANEL LATERAL) -->
+    <div id="drawer-proyectos" class="drawer-panel" role="dialog" aria-modal="true">
+        <div class="drawer-header">
+            <div class="drawer-header-dev">
+                <div id="drawer-avatar" class="drawer-header-avatar">?</div>
+                <div>
+                    <h3 id="drawer-dev-name" style="margin: 0; font-size: 1.1rem; color: #1e293b;">Desarrollador</h3>
+                    <div id="drawer-dev-handle" style="font-size: 0.8rem; color: #64748b;">@usuario</div>
+                </div>
+            </div>
+            <button class="drawer-close" onclick="cerrarDrawerProyectos()" title="Cerrar panel">✕</button>
+        </div>
+
+        <div class="drawer-body">
+            <!-- Paneles individuales por cada usuario -->
+            {% for usuario in usuarios %}
+            <div id="dev-projects-{{ usuario.id }}" class="dev-projects-content" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">
+                        Proyectos Asignados
+                    </span>
+                    <span style="font-size: 0.8rem; background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; padding: 3px 10px; border-radius: 20px; font-weight: 700;">
+                        {{ usuario.proyectos_asignados|length }} {% if usuario.proyectos_asignados|length == 1 %}proyecto activo{% else %}proyectos activos{% endif %}
+                    </span>
+                </div>
+
+                {% for p in usuario.proyectos_asignados %}
+                <div class="project-drawer-card">
+                    <div class="project-drawer-top">
+                        <div>
+                            <h4 class="project-drawer-title">
+                                <span>{{ p.proyecto.get_tipo_display_icon }}</span>
+                                <span>{{ p.proyecto.nombre }}</span>
+                            </h4>
+                            {% if p.proyecto.proyecto_padre %}
+                            <div class="module-tag">
+                                🧩 Módulo de: <strong>{{ p.proyecto.proyecto_padre.nombre }}</strong>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <span class="badge-tipo badge-{{ p.proyecto.tipo }}">
+                            {{ p.proyecto.get_tipo_display }}
+                        </span>
+                    </div>
+
+                    <!-- Progreso de tareas del desarrollador en este proyecto -->
+                    <div class="progress-wrapper">
+                        <div class="progress-label-row">
+                            <span>Avance del desarrollador</span>
+                            <span class="progress-percent" style="color: {% if p.porcentaje >= 80 %}#16a34a{% elif p.porcentaje >= 40 %}#ff6600{% else %}#64748b{% endif %};">
+                                {{ p.porcentaje }}% completado ({{ p.finalizadas }}/{{ p.total }} tareas)
+                            </span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: {{ p.porcentaje }}%; background: {% if p.porcentaje >= 80 %}#16a34a{% elif p.porcentaje >= 40 %}linear-gradient(90deg, #ff6600, #ff8533){% else %}#94a3b8{% endif %};"></div>
+                        </div>
+                    </div>
+
+                    <!-- Desglose de tareas del desarrollador -->
+                    <div class="stats-pill-grid">
+                        <span class="mini-pill mini-pill-total" title="Total tareas asignadas al desarrollador en este proyecto">
+                            📋 {{ p.total }} tareas
+                        </span>
+                        <span class="mini-pill mini-pill-pending" title="Pendientes (Por hacer)">
+                            ⏳ {{ p.pendientes }} pendientes
+                        </span>
+                        <span class="mini-pill mini-pill-process" title="En proceso">
+                            ⚙️ {{ p.en_proceso }} en proceso
+                        </span>
+                        <span class="mini-pill mini-pill-review" title="En revisión">
+                            🔍 {{ p.en_revision }} en revisión
+                        </span>
+                        <span class="mini-pill mini-pill-finished" title="Finalizadas">
+                            ✅ {{ p.finalizadas }} finalizadas
+                        </span>
+                    </div>
+
+                    <!-- Botones de acción para entrar al proyecto y ver su avance -->
+                    <div class="project-drawer-actions">
+                        <a href="{% url 'panel_desarrollador' p.proyecto.id %}" class="btn-enter-project" title="Ir al Tablero Kanban de este proyecto para ver y revisar avance">
+                            👁️ Entrar al Tablero / Ver Avance ➔
+                        </a>
+                        {% if p.proyecto.proyecto_padre %}
+                        <a href="{% url 'panel_desarrollador' p.proyecto.proyecto_padre.id %}" class="btn-parent-project" title="Ver Tablero del Proyecto Principal ({{ p.proyecto.proyecto_padre.nombre }})">
+                            📂 Ver Proyecto Padre
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div style="text-align: center; padding: 40px 20px; background: white; border-radius: 12px; border: 1.5px dashed #cbd5e1;">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">📂</div>
+                    <h4 style="margin: 0 0 6px 0; color: #1e293b;">Sin proyectos activos</h4>
+                    <p style="margin: 0; color: #64748b; font-size: 0.85rem;">
+                        Este desarrollador no tiene tareas asignadas en ningún proyecto activo actualmente.
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="drawer-footer">
+            <button type="button" class="btn-back" onclick="cerrarDrawerProyectos()" style="padding: 8px 18px; font-size: 0.85rem; cursor: pointer;">
+                Cerrar Panel
+            </button>
+        </div>
+    </div>
+
+    {% include 'proyectos/_timeout.html' %}
+
+    <script>
+        function abrirDrawerProyectos(userId) {
+            // Ocultar todos los contenidos de desarrolladores anteriores
+            document.querySelectorAll('.dev-projects-content').forEach(function(el) {
+                el.style.display = 'none';
+            });
+
+            // Mostrar el contenido del usuario seleccionado
+            const targetContent = document.getElementById('dev-projects-' + userId);
+            if (targetContent) {
+                targetContent.style.display = 'block';
+            }
+
+            // Obtener avatar y datos del desarrollador desde la fila correspondiente
+            const btn = document.querySelector(`button[onclick="abrirDrawerProyectos('${userId}')"]`);
+            if (btn) {
+                const devRow = btn.closest('tr');
+                if (devRow) {
+                    const nameEl = devRow.querySelector('.dev-info div div:first-child');
+                    const handleEl = devRow.querySelector('.dev-info div div:last-child');
+                    const avatarEl = devRow.querySelector('.dev-avatar');
+
+                    document.getElementById('drawer-dev-name').innerText = nameEl ? nameEl.innerText.trim() : 'Desarrollador';
+                    document.getElementById('drawer-dev-handle').innerText = handleEl ? handleEl.innerText.trim() : '';
+                    document.getElementById('drawer-avatar').innerText = avatarEl ? avatarEl.innerText.trim() : '?';
+                }
+            }
+
+            // Activar backdrop y drawer con animaciones
+            document.getElementById('drawer-backdrop').classList.add('active');
+            document.getElementById('drawer-proyectos').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarDrawerProyectos() {
+            document.getElementById('drawer-backdrop').classList.remove('active');
+            document.getElementById('drawer-proyectos').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Permitir cerrar el panel con la tecla Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                cerrarDrawerProyectos();
+            }
+        });
+    </script>
+</body>
+
+</html>

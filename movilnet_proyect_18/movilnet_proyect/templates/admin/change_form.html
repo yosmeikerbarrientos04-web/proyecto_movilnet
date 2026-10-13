@@ -1,0 +1,71 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+/* Solo hace visible el cuadro de contraseña */
+input[type="password"] {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    padding: 6px 10px !important;
+    font-size: 0.95rem !important;
+    min-width: 220px !important;
+}
+input[type="password"]:focus {
+    border-color: #6366f1 !important;
+    outline: 2px solid rgba(99,102,241,0.2) !important;
+}
+.toggle-pwd-btn {
+    margin-left: 8px;
+    padding: 4px 10px;
+    font-size: 0.85rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #f8fafc;
+    color: #334155;
+    vertical-align: middle;
+}
+.toggle-pwd-btn:hover {
+    background: #e2e8f0;
+}
+</style>
+{% endblock %}
+
+{% block admin_change_form_document_ready %}
+{{ block.super }}
+<script>
+(function() {
+    function addToggle(input) {
+        if (input.dataset.toggleAdded) return;
+        input.dataset.toggleAdded = "1";
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "toggle-pwd-btn";
+        btn.textContent = "👁 Ver";
+        btn.addEventListener("click", function() {
+            if (input.type === "password") {
+                input.type = "text";
+                btn.textContent = "🙈 Ocultar";
+            } else {
+                input.type = "password";
+                btn.textContent = "👁 Ver";
+            }
+        });
+        input.insertAdjacentElement("afterend", btn);
+    }
+
+    function init() {
+        document.querySelectorAll("input[type='password']").forEach(addToggle);
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();
+</script>
+{% endblock %}
